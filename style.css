@@ -1,30 +1,30 @@
-body {
+body, html {
   margin: 0;
   padding: 0;
-  background-color: #87ceeb;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  -webkit-touch-callout: none; /* 長押しメニューを無効化（iOS） */
-  -webkit-user-select: none;   /* テキスト選択無効化（iOS） */
-  user-select: none;
-
-}
-
-canvas {
-  background-color: #fff;
-  border: 2px solid #000;
+  height: 100%;
+  overflow: hidden;
+  background-color: #007BFF;
   touch-action: none;
-  max-width:100vw;
-  height: auto;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
-.guide {
-  margin-top: 10px;
-  font-size: 16px;
-  background: #fff;
-  padding: 5px 10px;
-  border: 1px solid #000;
-  border-radius: 5px;
+#gameCanvas {
+  width: 100vw;
+  height: calc(100vh - 60px); /* 下に60px分だけ余白 */
+  display: block;
+}
+
+#instructions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  line-height: 60px;
 }
