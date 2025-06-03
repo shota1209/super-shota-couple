@@ -33,11 +33,10 @@
   <img id="title-screen" src="images/super-shota-couple-title.png" alt="SUPER SHOTA COUPLE Title Screen">
 
   <script>
-    // タイトル画面をクリックでゲームスタートへ遷移（後で本編にリンク）
-    document.getElementById("title-screen").addEventListener("click", () => {
-      alert("ゲームスタート！（ここに遷移処理を追加できます）");
-      // location.href = "game.html"; ← 本編ページができたらここを有効に
-    });
-  </script>
+  document.getElementById("title-screen").addEventListener("click", () => {
+    location.href = "game.html";  // ← 本編ページに遷移
+  });
+</script>
+
 </body>
 </html>
