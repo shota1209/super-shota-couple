@@ -11,14 +11,14 @@ body {
 canvas {
   background-color: #fff;
   border: 2px solid #000;
+  touch-action: none;
 }
 
-.controls {
+.guide {
   margin-top: 10px;
-}
-
-.controls button {
-  font-size: 20px;
-  padding: 10px 20px;
-  margin: 0 10px;
+  font-size: 16px;
+  background: #fff;
+  padding: 5px 10px;
+  border: 1px solid #000;
+  border-radius: 5px;
 }
