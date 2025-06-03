@@ -7,7 +7,7 @@ shotaImg.src = 'images/shota.png';
 const roseImg = new Image();
 roseImg.src = 'images/rose.png';
 
-let shota = { x: 400, y: 500, width: 50, height: 80, vy: 0, jumping: false };
+let shota = { x: 400, y: 500, width: 75, height: 120, vy: 0, jumping: false };
 let roses = [];
 let collected = 0;
 const totalRoses = 15;
@@ -20,8 +20,8 @@ function spawnRose() {
   roses.push({
     x: Math.random() * (canvas.width - 30),
     y: -30,
-    width: 30,
-    height: 30,
+    width: 50,
+    height: 50,
     speed: 3 + Math.random() * 2
   });
 }
