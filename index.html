@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>SUPER SHOTA COUPLE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #007BFF;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #title-screen {
+      max-width: 100%;
+      height: auto;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    #title-screen:hover {
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body>
+  <img id="title-screen" src="images/super-shota-couple-title.png" alt="SUPER SHOTA COUPLE Title Screen">
+
+  <script>
+    // タイトル画面をクリックでゲームスタートへ遷移（後で本編にリンク）
+    document.getElementById("title-screen").addEventListener("click", () => {
+      alert("ゲームスタート！（ここに遷移処理を追加できます）");
+      // location.href = "game.html"; ← 本編ページができたらここを有効に
+    });
+  </script>
+</body>
+</html>
