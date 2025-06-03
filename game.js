@@ -13,6 +13,9 @@ let collected = 0;
 const totalRoses = 15;
 const requiredToWin = 10;
 
+let moveLeft = false;
+let moveRight = false;
+
 function spawnRose() {
   roses.push({
     x: Math.random() * (canvas.width - 30),
@@ -37,8 +40,11 @@ function draw() {
 }
 
 function update() {
+  if (moveLeft) shota.x -= 5;
+  if (moveRight) shota.x += 5;
+
   if (shota.jumping) {
-    shota.vy += 1; // gravity
+    shota.vy += 1;
     shota.y += shota.vy;
     if (shota.y >= 500) {
       shota.y = 500;
@@ -50,7 +56,6 @@ function update() {
     rose.y += rose.speed;
   });
 
-  // キャッチ判定
   roses = roses.filter(rose => {
     const hit = rose.x < shota.x + shota.width &&
                 rose.x + rose.width > shota.x &&
@@ -73,21 +78,34 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-// 操作
-document.getElementById("leftBtn").addEventListener("click", () => {
-  shota.x -= 30;
-});
-document.getElementById("rightBtn").addEventListener("click", () => {
-  shota.x += 30;
-});
-document.getElementById("jumpBtn").addEventListener("click", () => {
-  if (!shota.jumping) {
+// 長押し移動
+canvas.addEventListener("touchstart", (e) => {
+  const x = e.touches[0].clientX;
+  if (x < window.innerWidth / 2) {
+    moveLeft = true;
+  } else {
+    moveRight = true;
+  }
+}, false);
+
+canvas.addEventListener("touchend", () => {
+  moveLeft = false;
+  moveRight = false;
+}, false);
+
+// スワイプでジャンプ
+let startY = 0;
+canvas.addEventListener("touchstart", (e) => {
+  startY = e.touches[0].clientY;
+}, { passive: true });
+
+canvas.addEventListener("touchend", (e) => {
+  const endY = e.changedTouches[0].clientY;
+  if (startY - endY > 50 && !shota.jumping) {
     shota.vy = -20;
     shota.jumping = true;
   }
-});
+}, { passive: true });
 
-// 2秒ごとにバラ追加
 setInterval(spawnRose, 2000);
-
 gameLoop();
