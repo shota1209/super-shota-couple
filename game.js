@@ -1,5 +1,14 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+// ① キャンバスとコンテキストの取得
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+// ② キャンバスサイズを画面に合わせる処理
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight - 60; // 下の説明欄を差し引く
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas(); // 初期化
 
 const shotaImg = new Image();
 shotaImg.src = 'images/shota.png';
