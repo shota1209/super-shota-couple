@@ -2,7 +2,8 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  font-family: 'Arial', sans-serif;
+  background-color: #87CEEB;
+  font-family: Arial, sans-serif;
 }
 
 #gameCanvas {
@@ -12,7 +13,7 @@ body {
   top: 0;
   left: 0;
 
-  /* 追加で入れるべきスタイル ↓ */
+  /* iPhoneのコピー防止など */
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
@@ -23,9 +24,10 @@ body {
   bottom: 0;
   width: 100%;
   height: 60px;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.8);
+  color: #000;
   text-align: center;
   line-height: 60px;
-  font-size: 1.2em;
+  font-size: 18px;
   z-index: 10;
 }
