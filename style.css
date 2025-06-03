@@ -6,6 +6,10 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  -webkit-touch-callout: none; /* 長押しメニューを無効化（iOS） */
+  -webkit-user-select: none;   /* テキスト選択無効化（iOS） */
+  user-select: none;
+
 }
 
 canvas {
