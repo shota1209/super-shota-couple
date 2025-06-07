@@ -4,39 +4,15 @@
   <meta charset="UTF-8">
   <title>SUPER SHOTA COUPLE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #007BFF;
-      font-family: 'Arial', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    #title-screen {
-      max-width: 100%;
-      height: auto;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    #title-screen:hover {
-      transform: scale(1.03);
-    }
-  </style>
+  <link rel="stylesheet" href="index-style.css">
 </head>
 <body>
-  <img id="title-screen" src="images/super-shota-couple-title.png" alt="SUPER SHOTA COUPLE Title Screen">
+  <!-- 背景画像としてタイトルを設定 -->
+  <img id="title-image" src="images/super-shota-couple-title.png" alt="Title Screen" style="position:absolute; width:100%; height:100%; object-fit:cover; z-index:0;">
 
-  <script>
-  document.getElementById("title-screen").addEventListener("click", () => {
-    location.href = "game.html";  // ← 本編ページに遷移
-  });
-</script>
+  <!-- Shotaくんのキャラ画像 -->
+  <img id="shota" src="images/shota.png" alt="shota">
 
+  <script src="index-script.js"></script>
 </body>
 </html>
