@@ -1,0 +1,45 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #ffe6f0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Arial', sans-serif;
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+  position: relative;
+}
+
+body.visible {
+  opacity: 1;
+}
+
+#shota {
+  position: absolute;
+  bottom: 20px;
+  left: -100px;
+  width: 80px;
+  opacity: 0;
+  transition: left 6s linear, opacity 2s ease-in;
+  z-index: 2;
+}
+
+.petal {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-image: url('images/petal.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: fall linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes fall {
+  0% { transform: translateY(-10%) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
