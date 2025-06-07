@@ -1,5 +1,6 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+const backgroundDiv = document.getElementById("background");
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -8,7 +9,7 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-// 画像読み込み
+// 画像
 const shotaImg = new Image();
 shotaImg.src = "images/shota.png";
 
@@ -19,19 +20,23 @@ const ballImg = new Image();
 ballImg.src = "images/ball.png";
 
 // 背景画像
-const backgrounds = [
+const backgroundImages = [
   "images/bg1.png",
   "images/bg2.png",
   "images/bg3.png",
-  "images/bg4.png"
+  "images/bg4.png",
+  "images/bg5.png"
 ];
-let backgroundIndex = 0;
-const bgImage = new Image();
-bgImage.src = backgrounds[backgroundIndex];
 
-let roseCount = 0;
-
-const soccerAudio = document.getElementById("soccerAudio");
+let currentBackgroundIndex = 0;
+function updateBackground(index) {
+  backgroundDiv.style.opacity = 0;
+  setTimeout(() => {
+    backgroundDiv.style.backgroundImage = `url(${backgroundImages[index]})`;
+    backgroundDiv.style.opacity = 1;
+  }, 400);
+}
+updateBackground(0);
 
 // キャラ状態
 let shota = {
@@ -44,17 +49,21 @@ let shota = {
   isJumping: false
 };
 
-// バラ・ボール
-let rose = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
-let ball = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
-resetItem(rose);
-resetItem(ball);
+// バラ状態
+let rose = {
+  x: Math.random() * (canvas.width - 40),
+  y: -40,
+  width: 40,
+  height: 40,
+  speed: 3
+};
 
-// 重力・ジャンプ
+let roseCount = 0;
+
+// ジャンプ処理
 const gravity = 0.8;
 const jumpPower = -16;
 
-// タッチ操作
 let touchStartX = 0;
 let touchStartY = 0;
 let touchInterval = null;
@@ -63,7 +72,6 @@ canvas.addEventListener("touchstart", e => {
   const touch = e.touches[0];
   touchStartX = touch.clientX;
   touchStartY = touch.clientY;
-
   const center = canvas.width / 2;
   const direction = touchStartX < center ? -1 : 1;
 
@@ -74,13 +82,14 @@ canvas.addEventListener("touchstart", e => {
 
 canvas.addEventListener("touchmove", e => {
   const touch = e.touches[0];
-  const dx = touch.clientX - touchStartX;
-  const dy = touchStartY - touch.clientY;
+  const deltaX = touch.clientX - touchStartX;
+  const deltaY = touchStartY - touch.clientY;
 
-  if (dy > 50 && !shota.isJumping) {
-    if (Math.abs(dx) > 30) {
-      shota.vx = dx > 0 ? 5 : -5;
-    }
+  if (deltaY > 50 && Math.abs(deltaX) > 30 && !shota.isJumping) {
+    shota.vx = deltaX > 0 ? 3 : -3;
+    shota.vy = jumpPower;
+    shota.isJumping = true;
+  } else if (deltaY > 50 && !shota.isJumping) {
     shota.vy = jumpPower;
     shota.isJumping = true;
   }
@@ -91,61 +100,48 @@ canvas.addEventListener("touchend", () => {
   shota.vx = 0;
 }, { passive: true });
 
-function resetItem(item) {
-  item.x = Math.random() * (canvas.width - item.width);
-  item.y = -Math.random() * canvas.height;
-}
-
 function update() {
   shota.x += shota.vx;
   shota.y += shota.vy;
   shota.vy += gravity;
 
-  // 地面処理
   if (shota.y >= canvas.height - shota.height - 60) {
     shota.y = canvas.height - shota.height - 60;
     shota.vy = 0;
     shota.isJumping = false;
   }
 
-  // 画面端制限
   if (shota.x < 0) shota.x = 0;
   if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
 
-  [rose, ball].forEach(item => {
-    item.y += item.speed;
-    if (item.y > canvas.height) resetItem(item);
-  });
+  rose.y += rose.speed;
+  if (rose.y > canvas.height) {
+    rose.x = Math.random() * (canvas.width - rose.width);
+    rose.y = -40;
+  }
 
-  // 取得処理
-  if (isColliding(shota, rose)) {
+  // 衝突判定
+  if (
+    shota.x < rose.x + rose.width &&
+    shota.x + shota.width > rose.x &&
+    shota.y < rose.y + rose.height &&
+    shota.y + shota.height > rose.y
+  ) {
     roseCount++;
-    resetItem(rose);
-    if (roseCount % 3 === 0 && backgroundIndex < backgrounds.length - 1) {
-      backgroundIndex++;
-      bgImage.src = backgrounds[backgroundIndex];
+    rose.x = Math.random() * (canvas.width - rose.width);
+    rose.y = -40;
+
+    if (roseCount % 2 === 0 && roseCount / 2 < backgroundImages.length) {
+      currentBackgroundIndex = roseCount / 2;
+      updateBackground(currentBackgroundIndex);
     }
   }
-
-  if (isColliding(shota, ball)) {
-    resetItem(ball);
-    soccerAudio.currentTime = 0;
-    soccerAudio.play();
-  }
-}
-
-function isColliding(a, b) {
-  return a.x < b.x + b.width &&
-         a.x + a.width > b.x &&
-         a.y < b.y + b.height &&
-         a.y + a.height > b.y;
 }
 
 function draw() {
-  ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(shotaImg, shota.x, shota.y, shota.width, shota.height);
   ctx.drawImage(roseImg, rose.x, rose.y, rose.width, rose.height);
-  ctx.drawImage(ballImg, ball.x, ball.y, ball.width, ball.height);
 }
 
 function gameLoop() {
@@ -153,4 +149,5 @@ function gameLoop() {
   draw();
   requestAnimationFrame(gameLoop);
 }
+
 gameLoop();
