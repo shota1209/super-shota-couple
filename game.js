@@ -2,15 +2,12 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const backgroundDiv = document.getElementById("background");
 
-// BGM再生（ループ＆自動）
-const bgm = new Audio("audio/romantic.mp3");
-bgm.loop = true;
+const bgm = document.getElementById("bgm");
 bgm.volume = 0.6;
 bgm.play().catch(() => {
-  console.log("ユーザー操作で再生が必要です");
+  console.log("BGMの自動再生はブラウザによって制限されている可能性があります");
 });
 
-// リサイズ処理
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight - 60;
@@ -28,7 +25,7 @@ roseImg.src = "images/rose.png";
 const ballImg = new Image();
 ballImg.src = "images/ball.png";
 
-// 背景画像
+// 背景画像（5つ）
 const backgrounds = [
   "images/bg1.png",
   "images/bg2.png",
@@ -40,14 +37,10 @@ let backgroundIndex = 0;
 const bgImage = new Image();
 bgImage.src = backgrounds[backgroundIndex];
 
-// バラ制限
-let roseCount = 0;
-const maxRoses = 10;
-
-// SE
+// 音
 const soccerAudio = document.getElementById("soccerAudio");
 
-// キャラ状態
+// キャラ設定
 let shota = {
   x: canvas.width / 2,
   y: canvas.height - 160,
@@ -58,16 +51,19 @@ let shota = {
   isJumping: false
 };
 
-// バラ・ボール初期化
+// バラ・ボール設定
 let rose = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
 let ball = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
 resetItem(rose);
 resetItem(ball);
 
-// ジャンプ処理
+// ゲーム設定
 const gravity = 0.8;
 const jumpPower = -16;
+let roseCount = 0;
+const maxRoses = 10;
 
+// タッチ操作
 let touchStartX = 0;
 let touchStartY = 0;
 let touchInterval = null;
