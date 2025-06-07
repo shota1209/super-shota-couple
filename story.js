@@ -12,7 +12,7 @@ const storyLines = [
 window.onload = () => {
   const container = document.querySelector(".story-container");
 
-  // 背景画像・Shota・Kaoruを挿入
+  // 背景画像・Shota・Kaoru・テキストボックスを追加
   container.innerHTML = `
     <img src="images/romantic-pastel-bg.png" class="background" alt="背景">
     <img src="images/shota.png" class="shota" alt="Shota">
@@ -20,13 +20,15 @@ window.onload = () => {
     <div id="story-text" class="story-text"></div>
   `;
 
-  // セリフ表示処理
   const storyText = document.getElementById("story-text");
   let index = 0;
 
   function showNextLine() {
     if (index < storyLines.length) {
-      storyText.textContent = storyLines[index];
+      const p = document.createElement("p");
+      p.textContent = storyLines[index];
+      p.classList.add("fade-in");
+      storyText.appendChild(p);
       index++;
       setTimeout(showNextLine, 3500);
     } else {
