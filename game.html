@@ -7,11 +7,9 @@
   <link rel="stylesheet" href="game.css">
 </head>
 <body>
+
   <!-- ゲームキャンバス -->
   <canvas id="gameCanvas"></canvas>
-
-  <!-- 背景 -->
-  <div id="background"></div>
 
   <!-- 操作説明 -->
   <div id="instructions">
@@ -19,10 +17,14 @@
     バラを2つ集めるたびに、ふたりの物語が進みます…
   </div>
 
+  <!-- サウンド（SE） -->
+  <audio id="soccerAudio" src="audio/soccer.mp3"></audio>
+
   <!-- ロマンチックBGM -->
   <audio id="bgm" src="audio/romantic.mp3" loop autoplay></audio>
 
-  <!-- スクリプト -->
+  <!-- ゲーム本体 -->
   <script src="game.js"></script>
+
 </body>
 </html>
