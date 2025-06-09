@@ -1,45 +1,83 @@
-body {
+body, html {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #000;
+  background-color: black;
   font-family: 'Arial', sans-serif;
 }
 
 #background {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background-size: cover;
   background-position: center;
+  z-index: -2;
   transition: opacity 1s ease;
-  z-index: 0;
+}
+
+#particle-container {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: floatParticle linear infinite;
+}
+
+@keyframes floatParticle {
+  0% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+#silhouette {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 1s;
+  width: 200px;
+  z-index: 5;
+}
+
+#silhouette.visible {
+  opacity: 1;
 }
 
 #gameCanvas {
   display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
+  background: transparent;
+  position: relative;
+  z-index: 0;
 }
 
-#instructions {
+#poem {
   position: absolute;
-  bottom: 0;
+  top: 50px;
   width: 100%;
-  height: 60px;
-  background: rgba(255, 183, 230, 0.8);
-  color: #000;
   text-align: center;
-  line-height: 30px;
-  font-size: 18px;
-  padding: 5px 0;
+  font-size: 24px;
+  color: white;
+  opacity: 0;
+  transition: opacity 1s;
   z-index: 10;
 }
 
@@ -47,6 +85,7 @@ body {
   position: absolute;
   top: 10px;
   left: 10px;
+  display: flex;
   z-index: 10;
 }
 
@@ -56,36 +95,12 @@ body {
   margin-right: 5px;
 }
 
-#poem {
+#instructions {
   position: absolute;
-  top: 40%;
+  bottom: 20px;
   width: 100%;
   text-align: center;
-  font-size: 24px;
-  font-weight: bold;
   color: white;
-  text-shadow: 0 0 8px #f0c;
-  z-index: 15;
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-
-.petal {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  pointer-events: none;
-  z-index: 5;
-  animation: fall 3s linear forwards;
-}
-
-@keyframes fall {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(360deg);
-    opacity: 0;
-  }
+  font-size: 14px;
+  z-index: 10;
 }
