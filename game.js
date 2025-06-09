@@ -1,3 +1,4 @@
+// --- 既存コード（省略なし） ---
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const backgroundDiv = document.getElementById("background");
@@ -5,6 +6,8 @@ const poemDiv = document.getElementById("poem");
 const bgm = document.getElementById("bgm");
 const soccerAudio = document.getElementById("soccerAudio");
 const heartsContainer = document.getElementById("hearts");
+const silhouette = document.getElementById("silhouette");
+const particleContainer = document.getElementById("particle-container");
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -154,6 +157,24 @@ function createHeartEffect(x, y) {
   }
 }
 
+function createParticles() {
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    p.style.left = Math.random() * 100 + "vw";
+    p.style.top = Math.random() * 100 + "vh";
+    p.style.animationDuration = (8 + Math.random() * 4) + "s";
+    particleContainer.appendChild(p);
+  }
+}
+
+function showSilhouette() {
+  silhouette.style.opacity = 0.7;
+  setTimeout(() => {
+    silhouette.style.opacity = 0;
+  }, 3000);
+}
+
 function update() {
   shota.x += shota.vx;
   shota.y += shota.vy;
@@ -203,6 +224,9 @@ function update() {
 
         resetItem(rose);
         resetItem(ball);
+
+        if (roseCount === 6) showSilhouette();
+
       }, 600);
     }
   }
@@ -230,4 +254,6 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 gameLoop();
+
+createParticles();
 bgm.play();
