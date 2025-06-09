@@ -1,12 +1,10 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const backgroundDiv = document.getElementById("background");
-
+const poemDiv = document.getElementById("poem");
 const bgm = document.getElementById("bgm");
-bgm.volume = 0.6;
-bgm.play().catch(() => {
-  console.log("BGMの自動再生はブラウザによって制限されている可能性があります");
-});
+const soccerAudio = document.getElementById("soccerAudio");
+const heartsContainer = document.getElementById("hearts");
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -15,17 +13,14 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-// 画像読み込み
 const shotaImg = new Image();
 shotaImg.src = "images/shota.png";
-
 const roseImg = new Image();
 roseImg.src = "images/rose.png";
-
 const ballImg = new Image();
 ballImg.src = "images/ball.png";
+const heartIcon = "images/heart.png";
 
-// 背景画像（5つ）
 const backgrounds = [
   "images/bg1.png",
   "images/bg2.png",
@@ -33,14 +28,32 @@ const backgrounds = [
   "images/bg4.png",
   "images/bg5.png"
 ];
+
+const messages = [
+  "付き合ってください",
+  "今度はランドも行こ〜",
+  "キャンプで寝てごめん",
+  "また海外行こ〜",
+  "次は諏訪湖の花火だね"
+];
+
+const voiceAudios = [
+  "audio/rose1.mp3",
+  "audio/rose3.mp3",
+  "audio/rose5.mp3",
+  "audio/rose7.mp3",
+  "audio/rose9.mp3"
+];
+
+let roseCount = 0;
 let backgroundIndex = 0;
-const bgImage = new Image();
-bgImage.src = backgrounds[backgroundIndex];
+let bgImage = new Image();
+bgImage.src = backgrounds[0];
+let rose = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
+let ball = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
+resetItem(rose);
+resetItem(ball);
 
-// 音
-const soccerAudio = document.getElementById("soccerAudio");
-
-// キャラ設定
 let shota = {
   x: canvas.width / 2,
   y: canvas.height - 160,
@@ -51,19 +64,9 @@ let shota = {
   isJumping: false
 };
 
-// バラ・ボール設定
-let rose = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
-let ball = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
-resetItem(rose);
-resetItem(ball);
-
-// ゲーム設定
 const gravity = 0.8;
 const jumpPower = -16;
-let roseCount = 0;
-const maxRoses = 10;
 
-// タッチ操作
 let touchStartX = 0;
 let touchStartY = 0;
 let touchInterval = null;
@@ -72,7 +75,6 @@ canvas.addEventListener("touchstart", e => {
   const touch = e.touches[0];
   touchStartX = touch.clientX;
   touchStartY = touch.clientY;
-
   const center = canvas.width / 2;
   const direction = touchStartX < center ? -1 : 1;
 
@@ -92,6 +94,7 @@ canvas.addEventListener("touchmove", e => {
     }
     shota.vy = jumpPower;
     shota.isJumping = true;
+    new Audio("audio/jump.mp3").play();
   }
 }, { passive: true });
 
@@ -105,15 +108,50 @@ function resetItem(item) {
   item.y = -Math.random() * canvas.height;
 }
 
-function fadeBackground(newIndex) {
-  canvas.style.transition = "opacity 0.8s ease";
-  canvas.style.opacity = 0;
+function isColliding(a, b) {
+  return a.x < b.x + b.width &&
+         a.x + a.width > b.x &&
+         a.y < b.y + b.height &&
+         a.y + a.height > b.y;
+}
 
+function showHearts(count) {
+  heartsContainer.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const img = document.createElement("img");
+    img.src = heartIcon;
+    img.className = "heart-icon";
+    heartsContainer.appendChild(img);
+  }
+}
+
+function showPoem(text) {
+  poemDiv.innerText = text;
+  poemDiv.style.opacity = 1;
   setTimeout(() => {
-    bgImage.src = backgrounds[newIndex];
-    backgroundIndex = newIndex;
-    canvas.style.opacity = 1;
-  }, 400);
+    poemDiv.style.opacity = 0;
+  }, 2500);
+}
+
+function createPetal() {
+  const petal = document.createElement("img");
+  petal.src = "images/petal.png";
+  petal.className = "petal";
+  petal.style.left = Math.random() * window.innerWidth + "px";
+  document.body.appendChild(petal);
+  setTimeout(() => petal.remove(), 3000);
+}
+
+function createHeartEffect(x, y) {
+  for (let i = 0; i < 5; i++) {
+    const heart = document.createElement("img");
+    heart.src = "images/heart.png";
+    heart.className = "petal";
+    heart.style.left = x + (Math.random() * 40 - 20) + "px";
+    heart.style.top = y + (Math.random() * 40 - 20) + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 3000);
+  }
 }
 
 function update() {
@@ -138,35 +176,48 @@ function update() {
   if (isColliding(shota, rose)) {
     roseCount++;
     resetItem(rose);
+    createHeartEffect(shota.x, shota.y);
+    createPetal();
+    showHearts(roseCount);
 
+    const messageIndex = Math.floor((roseCount - 1) / 2);
     if (roseCount % 2 === 0 && backgroundIndex < backgrounds.length - 1) {
-      fadeBackground(backgroundIndex + 1);
-    }
-
-    if (roseCount >= maxRoses) {
+      backgroundIndex++;
+      backgroundDiv.style.opacity = 0;
       setTimeout(() => {
-        window.location.href = "ending.html";
-      }, 1500);
+        bgImage.src = backgrounds[backgroundIndex];
+        backgroundDiv.style.backgroundImage = `url(${bgImage.src})`;
+        backgroundDiv.style.opacity = 1;
+
+        if (roseCount === 10) {
+          showPoem("そして──翔太が決意した瞬間へ…");
+          new Audio("audio/shota_final.mp3").play();
+          for (let i = 0; i < 50; i++) setTimeout(createPetal, i * 50);
+        } else if (roseCount === 9) {
+          showPoem("次が最後の1輪…");
+        } else {
+          showPoem(messages[messageIndex] || "");
+          const voice = new Audio(voiceAudios[messageIndex]);
+          voice.play();
+        }
+
+        resetItem(rose);
+        resetItem(ball);
+      }, 600);
     }
   }
 
-  if (isColliding(shota, ball)) {
+  if (isColliding(shota, ball) && roseCount < 10) {
+    if (poemDiv.style.opacity === "0") {
+      soccerAudio.currentTime = 0;
+      soccerAudio.play();
+    }
     resetItem(ball);
-    soccerAudio.currentTime = 0;
-    soccerAudio.play();
   }
-}
-
-function isColliding(a, b) {
-  return (
-    a.x < b.x + b.width &&
-    a.x + a.width > b.x &&
-    a.y < b.y + b.height &&
-    a.y + a.height > b.y
-  );
 }
 
 function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
   ctx.drawImage(shotaImg, shota.x, shota.y, shota.width, shota.height);
   ctx.drawImage(roseImg, rose.x, rose.y, rose.width, rose.height);
@@ -179,3 +230,4 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 gameLoop();
+bgm.play();
