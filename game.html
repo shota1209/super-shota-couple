@@ -1,23 +1,20 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta charset="UTF-8">
   <title>Super Shota Couple - ゲーム</title>
-  <link rel="stylesheet" href="game.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="game.css">
 </head>
 <body>
   <!-- 背景 -->
   <div id="background"></div>
 
-  <!-- ゲームキャンバス -->
-  <canvas id="gameCanvas"></canvas>
+  <!-- 光の粒子コンテナ -->
+  <div id="particle-container"></div>
 
-  <!-- 操作説明 -->
-  <div id="instructions">
-    ←→長押しで移動 / ↑スワイプでジャンプ<br>
-    バラを集めて、ふたりの物語を進めよう。
-  </div>
+  <!-- シルエット画像 -->
+  <img id="silhouette" src="images/silhouette.png" />
 
   <!-- ハートUI -->
   <div id="hearts"></div>
@@ -25,19 +22,19 @@
   <!-- ポエム -->
   <div id="poem"></div>
 
-  <!-- 音楽・効果音 -->
+  <!-- メインゲームキャンバス -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- 操作説明 -->
+  <div id="instructions">
+    ←→長押しで移動 / ↑スワイプでジャンプ<br>
+    バラを3つ集めるたびに、ふたりの物語が進みます…
+  </div>
+
+  <!-- 音声ファイル -->
   <audio id="bgm" src="audio/romantic.mp3" loop autoplay></audio>
-  <audio id="jumpSound" src="audio/jump.mp3"></audio>
+  <audio id="soccerAudio" src="audio/soccer.mp3"></audio>
 
-  <!-- ボイス（バラ用） -->
-  <audio id="rose1" src="audio/rose1.mp3"></audio>
-  <audio id="rose3" src="audio/rose3.mp3"></audio>
-  <audio id="rose5" src="audio/rose5.mp3"></audio>
-  <audio id="rose7" src="audio/rose7.mp3"></audio>
-  <audio id="rose9" src="audio/rose9.mp3"></audio>
-  <audio id="shota_last" src="audio/shota_last.mp3"></audio>
-
-  <!-- メインスクリプト -->
   <script src="game.js"></script>
 </body>
 </html>
