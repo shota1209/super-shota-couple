@@ -1,4 +1,6 @@
-// 完成版 game.js
+
+// === 完成版 game.js ===
+// ピンクのフェードイン文字、ジャンプ音、10個目の演出、soccer音、rose7再生修正
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -8,9 +10,6 @@ const bgm = document.getElementById("bgm");
 const soccerAudio = document.getElementById("soccerAudio");
 const heartsContainer = document.getElementById("hearts");
 const roseMessage = document.getElementById("rose-message");
-const finalVoice = document.getElementById("finalVoice");
-const jumpSound = new Audio("audio/jump.mp3");
-const finalVideo = document.getElementById("finalVideo");
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -77,6 +76,7 @@ let touchStartY = 0;
 let touchInterval = null;
 
 canvas.addEventListener("touchstart", e => {
+  e.preventDefault();
   const touch = e.touches[0];
   touchStartX = touch.clientX;
   touchStartY = touch.clientY;
@@ -85,9 +85,10 @@ canvas.addEventListener("touchstart", e => {
   touchInterval = setInterval(() => {
     shota.vx = 5 * direction;
   }, 16);
-}, { passive: true });
+}, { passive: false });
 
 canvas.addEventListener("touchmove", e => {
+  e.preventDefault();
   const touch = e.touches[0];
   const dx = touch.clientX - touchStartX;
   const dy = touchStartY - touch.clientY;
@@ -97,18 +98,14 @@ canvas.addEventListener("touchmove", e => {
     }
     shota.vy = jumpPower;
     shota.isJumping = true;
-    jumpSound.play();
+    document.getElementById("jumpSound").play();
   }
-}, { passive: true });
+}, { passive: false });
 
 canvas.addEventListener("touchend", () => {
   clearInterval(touchInterval);
   shota.vx = 0;
-}, { passive: true });
-
-document.body.addEventListener("touchstart", () => {
-  bgm.play();
-}, { once: true });
+}, { passive: false });
 
 function resetItem(item) {
   item.x = Math.random() * (canvas.width - item.width);
@@ -136,37 +133,93 @@ function showRoseMessage(text) {
 }
 
 function createPetal() {
-  const petal = document.createElement("div");
+  const petal = document.createElement("img");
+  petal.src = "images/petal.png";
   petal.className = "petal";
-  petal.style.left = `${Math.random() * 100}%`;
+  petal.style.left = Math.random() * window.innerWidth + "px";
   document.body.appendChild(petal);
-  setTimeout(() => petal.remove(), 5000);
+  setTimeout(() => petal.remove(), 3000);
 }
 
-function fadeToWhiteWithMessages() {
-  const fade = document.createElement("div");
-  fade.className = "white-fade";
-  document.body.appendChild(fade);
+function createHeartEffect(x, y) {
+  for (let i = 0; i < 5; i++) {
+    const heart = document.createElement("img");
+    heart.src = "images/heart.png";
+    heart.className = "petal";
+    heart.style.left = x + (Math.random() * 40 - 20) + "px";
+    heart.style.top = y + (Math.random() * 40 - 20) + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 3000);
+  }
+}
 
+function fadeToWhiteThenMessages() {
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100%";
+  overlay.style.height = "100%";
+  overlay.style.backgroundColor = "white";
+  overlay.style.opacity = "0";
+  overlay.style.transition = "opacity 2s";
+  overlay.style.zIndex = "50";
+  document.body.appendChild(overlay);
   setTimeout(() => {
-    showFinalMessage("今までありがとう", () => {
-      showFinalMessage("これからもよろしく", () => {
-        finalVideo.style.display = "block";
-        finalVideo.play();
-      });
-    });
+    overlay.style.opacity = "1";
+    setTimeout(() => showFinalMessages(overlay), 2000);
+  }, 100);
+}
+
+function showFinalMessages(overlay) {
+  const message1 = document.createElement("div");
+  message1.textContent = "今までありがとう";
+  styleFinalMessage(message1);
+  overlay.appendChild(message1);
+  setTimeout(() => {
+    message1.style.opacity = "0";
+    setTimeout(() => {
+      overlay.removeChild(message1);
+      const message2 = document.createElement("div");
+      message2.textContent = "これからもよろしく";
+      styleFinalMessage(message2);
+      overlay.appendChild(message2);
+      setTimeout(() => {
+        message2.style.opacity = "0";
+        setTimeout(() => {
+          overlay.removeChild(message2);
+          showFinalVideo(overlay);
+        }, 2000);
+      }, 3000);
+    }, 2000);
   }, 3000);
 }
 
-function showFinalMessage(text, callback) {
-  const m = document.createElement("div");
-  m.className = "final-message";
-  m.textContent = text;
-  document.body.appendChild(m);
-  setTimeout(() => {
-    m.remove();
-    if (callback) callback();
-  }, 4000);
+function styleFinalMessage(el) {
+  el.style.position = "absolute";
+  el.style.top = "40%";
+  el.style.left = "50%";
+  el.style.transform = "translate(-50%, -50%)";
+  el.style.fontSize = "32px";
+  el.style.color = "pink";
+  el.style.fontFamily = "'Georgia', serif";
+  el.style.opacity = "1";
+  el.style.transition = "opacity 2s";
+  el.style.textShadow = "0 0 10px white";
+}
+
+function showFinalVideo(container) {
+  const video = document.createElement("video");
+  video.src = "video/propose.mp4";
+  video.autoplay = true;
+  video.controls = false;
+  video.style.position = "absolute";
+  video.style.top = "50%";
+  video.style.left = "50%";
+  video.style.transform = "translate(-50%, -50%)";
+  video.style.maxWidth = "100%";
+  video.style.maxHeight = "100%";
+  container.appendChild(video);
 }
 
 function update() {
@@ -180,6 +233,7 @@ function update() {
   }
   if (shota.x < 0) shota.x = 0;
   if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
+
   [rose, ball].forEach(item => {
     item.y += item.speed;
     if (item.y > canvas.height) resetItem(item);
@@ -188,14 +242,17 @@ function update() {
   if (isColliding(shota, rose)) {
     roseCount++;
     resetItem(rose);
+    createHeartEffect(shota.x, shota.y);
     createPetal();
     showHearts(roseCount);
 
-    if ([1,3,5,7,9].includes(roseCount)) {
+    if ([1, 3, 5, 7, 9].includes(roseCount)) {
       showRoseMessage(messages[(roseCount - 1) / 2]);
-      new Audio(voiceAudios[(roseCount - 1) / 2]).play();
+      const voice = new Audio(voiceAudios[(roseCount - 1) / 2]);
+      voice.play().catch(() => {});
     }
-    if ([2,4,6,8].includes(roseCount)) {
+
+    if ([2, 4, 6, 8].includes(roseCount)) {
       backgroundIndex++;
       backgroundDiv.style.opacity = 0;
       setTimeout(() => {
@@ -204,15 +261,28 @@ function update() {
         backgroundDiv.style.opacity = 1;
       }, 600);
     }
+
+    if (roseCount === 9) {
+      poemDiv.innerText = "次が最後の1輪…";
+      poemDiv.style.opacity = 1;
+      setTimeout(() => poemDiv.style.opacity = 0, 3000);
+    }
+
     if (roseCount === 10) {
-      finalVoice.play();
-      fadeToWhiteWithMessages();
+      document.getElementById("finalVoice").play().catch(() => {});
+      for (let i = 0; i < 50; i++) setTimeout(createPetal, i * 50);
+      poemDiv.innerText = "そして──翔太が決意した瞬間へ…";
+      poemDiv.style.opacity = 1;
+      setTimeout(() => {
+        poemDiv.style.opacity = 0;
+        fadeToWhiteThenMessages();
+      }, 4000);
     }
   }
 
-  if (isColliding(shota, ball)) {
+  if (isColliding(shota, ball) && roseCount < 10 && poemDiv.style.opacity === "0") {
     soccerAudio.currentTime = 0;
-    soccerAudio.play();
+    soccerAudio.play().catch(() => {});
     resetItem(ball);
   }
 }
@@ -230,5 +300,9 @@ function gameLoop() {
   draw();
   requestAnimationFrame(gameLoop);
 }
+
+window.onload = () => {
+  bgm.play().catch(() => {});
+};
 
 gameLoop();
