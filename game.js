@@ -1,4 +1,5 @@
-// 最新版 game.js（全演出含む、BGM、音声、粒子、シルエットすべて対応）
+
+// 統合版 game.js（演出・BGM・効果音・光・シルエット・字幕・ジャンプ音などすべて対応）
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -8,6 +9,9 @@ const bgm = document.getElementById("bgm");
 const soccerAudio = document.getElementById("soccerAudio");
 const heartsContainer = document.getElementById("hearts");
 const roseMessage = document.getElementById("rose-message");
+const instruction = document.getElementById("instructions");
+
+let firstTouch = false;
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -74,6 +78,11 @@ let touchStartY = 0;
 let touchInterval = null;
 
 canvas.addEventListener("touchstart", e => {
+  if (!firstTouch) {
+    bgm.play();
+    instruction.style.opacity = 0.6;
+    firstTouch = true;
+  }
   const touch = e.touches[0];
   touchStartX = touch.clientX;
   touchStartY = touch.clientY;
@@ -144,7 +153,8 @@ function createHeartEffect(x, y) {
 }
 
 function showSilhouette() {
-  const s = document.createElement("div");
+  const s = document.createElement("img");
+  s.src = "images/silhouette.png";
   s.className = "silhouette";
   document.body.appendChild(s);
   setTimeout(() => s.remove(), 4000);
@@ -182,7 +192,6 @@ function update() {
     createHeartEffect(shota.x, shota.y);
     createPetal();
     showHearts(roseCount);
-    const messageIndex = Math.floor(roseCount / 2);
     if ([1,3,5,7,9].includes(roseCount)) {
       roseMessage.textContent = messages[(roseCount-1)/2];
       roseMessage.classList.add("visible");
@@ -198,6 +207,7 @@ function update() {
         backgroundDiv.style.backgroundImage = `url(${bgImage.src})`;
         backgroundDiv.style.opacity = 1;
         showSilhouette();
+        createBackgroundParticles();
       }, 600);
     }
     if (roseCount === 9) {
@@ -214,7 +224,7 @@ function update() {
     }
   }
 
-  if (isColliding(shota, ball) && roseCount < 10 && poemDiv.style.opacity === "0") {
+  if (isColliding(shota, ball) && roseCount < 10) {
     soccerAudio.currentTime = 0;
     soccerAudio.play();
     resetItem(ball);
@@ -237,7 +247,6 @@ function gameLoop() {
 
 window.onload = () => {
   createBackgroundParticles();
-  bgm.play();
 };
 
 gameLoop();
