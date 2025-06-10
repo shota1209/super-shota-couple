@@ -1,5 +1,9 @@
-
-// 統合版 game.js（演出・BGM・効果音・光・シルエット・字幕・ジャンプ音などすべて対応）
+// === 最新版 game.js ===
+// - ピンクのフェードイン文字
+// - ジャンプ修正 & 音再生
+// - 最後のバラで音再生
+// - silhouette表示修正
+// - iOS長押し対策
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -9,9 +13,7 @@ const bgm = document.getElementById("bgm");
 const soccerAudio = document.getElementById("soccerAudio");
 const heartsContainer = document.getElementById("hearts");
 const roseMessage = document.getElementById("rose-message");
-const instruction = document.getElementById("instructions");
-
-let firstTouch = false;
+const silhouette = document.getElementById("silhouette");
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -78,11 +80,7 @@ let touchStartY = 0;
 let touchInterval = null;
 
 canvas.addEventListener("touchstart", e => {
-  if (!firstTouch) {
-    bgm.play();
-    instruction.style.opacity = 0.6;
-    firstTouch = true;
-  }
+  e.preventDefault();
   const touch = e.touches[0];
   touchStartX = touch.clientX;
   touchStartY = touch.clientY;
@@ -91,9 +89,10 @@ canvas.addEventListener("touchstart", e => {
   touchInterval = setInterval(() => {
     shota.vx = 5 * direction;
   }, 16);
-}, { passive: true });
+}, { passive: false });
 
 canvas.addEventListener("touchmove", e => {
+  e.preventDefault();
   const touch = e.touches[0];
   const dx = touch.clientX - touchStartX;
   const dy = touchStartY - touch.clientY;
@@ -105,12 +104,12 @@ canvas.addEventListener("touchmove", e => {
     shota.isJumping = true;
     new Audio("audio/jump.mp3").play();
   }
-}, { passive: true });
+}, { passive: false });
 
 canvas.addEventListener("touchend", () => {
   clearInterval(touchInterval);
   shota.vx = 0;
-}, { passive: true });
+}, { passive: false });
 
 function resetItem(item) {
   item.x = Math.random() * (canvas.width - item.width);
@@ -129,6 +128,12 @@ function showHearts(count) {
     img.className = "heart-icon";
     heartsContainer.appendChild(img);
   }
+}
+
+function showRoseMessage(text) {
+  roseMessage.textContent = text;
+  roseMessage.classList.add("visible");
+  setTimeout(() => roseMessage.classList.remove("visible"), 4000);
 }
 
 function createPetal() {
@@ -152,24 +157,6 @@ function createHeartEffect(x, y) {
   }
 }
 
-function showSilhouette() {
-  const s = document.createElement("img");
-  s.src = "images/silhouette.png";
-  s.className = "silhouette";
-  document.body.appendChild(s);
-  setTimeout(() => s.remove(), 4000);
-}
-
-function createBackgroundParticles() {
-  for (let i = 0; i < 30; i++) {
-    const star = document.createElement("div");
-    star.className = "background-particle";
-    star.style.left = `${Math.random() * 100}%`;
-    star.style.top = `${Math.random() * 100}%`;
-    document.body.appendChild(star);
-  }
-}
-
 function update() {
   shota.x += shota.vx;
   shota.y += shota.vy;
@@ -181,6 +168,7 @@ function update() {
   }
   if (shota.x < 0) shota.x = 0;
   if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
+
   [rose, ball].forEach(item => {
     item.y += item.speed;
     if (item.y > canvas.height) resetItem(item);
@@ -192,40 +180,31 @@ function update() {
     createHeartEffect(shota.x, shota.y);
     createPetal();
     showHearts(roseCount);
-    if ([1,3,5,7,9].includes(roseCount)) {
-      roseMessage.textContent = messages[(roseCount-1)/2];
-      roseMessage.classList.add("visible");
-      roseMessage.style.backgroundColor = "rgba(255, 182, 193, 0.8)";
-      roseMessage.style.color = "#fff";
-      roseMessage.style.padding = "10px 20px";
-      roseMessage.style.borderRadius = "10px";
-      roseMessage.style.position = "absolute";
-      roseMessage.style.top = "30%";
-      roseMessage.style.left = "50%";
-      roseMessage.style.transform = "translateX(-50%)";
-      roseMessage.style.zIndex = 20;
-      roseMessage.style.textAlign = "center";
-      setTimeout(() => roseMessage.classList.remove("visible"), 4000);
-      const voice = new Audio(voiceAudios[(roseCount-1)/2]);
+
+    if ([1, 3, 5, 7, 9].includes(roseCount)) {
+      showRoseMessage(messages[(roseCount - 1) / 2]);
+      const voice = new Audio(voiceAudios[(roseCount - 1) / 2]);
       voice.play();
     }
-    if ([2,4,6,8].includes(roseCount)) {
+
+    if ([2, 4, 6, 8].includes(roseCount)) {
       backgroundIndex++;
       backgroundDiv.style.opacity = 0;
       setTimeout(() => {
         bgImage.src = backgrounds[backgroundIndex];
         backgroundDiv.style.backgroundImage = `url(${bgImage.src})`;
         backgroundDiv.style.opacity = 1;
-        document.getElementById("silhouette").classList.add("visible");
-        setTimeout(() => document.getElementById("silhouette").classList.remove("visible"), 4000);
-        createBackgroundParticles();
+        silhouette.classList.add("visible");
+        setTimeout(() => silhouette.classList.remove("visible"), 3000);
       }, 600);
     }
+
     if (roseCount === 9) {
       poemDiv.innerText = "次が最後の1輪…";
       poemDiv.style.opacity = 1;
       setTimeout(() => poemDiv.style.opacity = 0, 3000);
     }
+
     if (roseCount === 10) {
       new Audio("audio/shota_last.mp3").play();
       for (let i = 0; i < 50; i++) setTimeout(createPetal, i * 50);
@@ -235,7 +214,7 @@ function update() {
     }
   }
 
-  if (isColliding(shota, ball) && roseCount < 10) {
+  if (isColliding(shota, ball) && roseCount < 10 && poemDiv.style.opacity === "0") {
     soccerAudio.currentTime = 0;
     soccerAudio.play();
     resetItem(ball);
@@ -258,6 +237,7 @@ function gameLoop() {
 
 window.onload = () => {
   createBackgroundParticles();
+  bgm.play();
 };
 
 gameLoop();
