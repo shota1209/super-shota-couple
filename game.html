@@ -7,28 +7,30 @@
   <link rel="stylesheet" href="game.css">
 </head>
 <body>
-  <!-- 背景画像 -->
+  <!-- スタートオーバーレイ -->
+  <div id="startOverlay">
+    <div id="startMessage">画面をタップしてスタート！<br>音声が再生されます</div>
+  </div>
+
+  <!-- 背景 -->
   <div id="background"></div>
 
-  <!-- 光の粒子 -->
+  <!-- 光の粒子コンテナ -->
   <div id="particle-container"></div>
 
-  <!-- シルエット画像（初期表示用） -->
+  <!-- シルエット画像 -->
   <img id="silhouette" src="images/silhouette.png" />
 
-  <!-- 動的シルエット（game.js内で追加される） -->
-  <!-- .silhouette は JS により挿入 -->
-
-  <!-- ハートアイコン -->
+  <!-- ハートUI -->
   <div id="hearts"></div>
 
-  <!-- 詩や最後のメッセージ表示 -->
+  <!-- ポエム -->
   <div id="poem"></div>
 
-  <!-- バラごとのメッセージ表示 -->
+  <!-- メッセージ表示 -->
   <div id="rose-message"></div>
 
-  <!-- ゲームのキャンバス -->
+  <!-- メインゲームキャンバス -->
   <canvas id="gameCanvas"></canvas>
 
   <!-- 操作説明 -->
@@ -37,12 +39,12 @@
     バラを3つ集めるたびに、ふたりの物語が進みます…
   </div>
 
-  <!-- 音声（BGM、サッカーSE） -->
-  <audio id="bgm" src="audio/romantic.mp3" loop autoplay></audio>
+  <!-- 音声ファイル -->
+  <audio id="bgm" src="audio/romantic.mp3" loop></audio>
   <audio id="soccerAudio" src="audio/soccer.mp3"></audio>
+  <audio id="jumpSound" src="audio/jump.mp3"></audio>
+  <audio id="finalVoice" src="audio/shota_final.mp3"></audio>
 
-  <!-- メインスクリプト -->
   <script src="game.js"></script>
 </body>
 </html>
-
