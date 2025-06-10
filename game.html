@@ -7,20 +7,19 @@
   <link rel="stylesheet" href="game.css">
 </head>
 <body>
-
   <!-- スタートオーバーレイ -->
   <div id="startOverlay">
     <div id="startMessage">画面をタップしてスタート！<br>音声が再生されます</div>
   </div>
+
+  <!-- フェード演出用白背景 -->
+  <div id="whiteOverlay"></div>
 
   <!-- 背景 -->
   <div id="background"></div>
 
   <!-- 光の粒子コンテナ -->
   <div id="particle-container"></div>
-
-  <!-- シルエット画像 -->
-  <img id="silhouette" src="images/silhouette.png" />
 
   <!-- ハートUI -->
   <div id="hearts"></div>
@@ -31,6 +30,10 @@
   <!-- メッセージ表示 -->
   <div id="rose-message"></div>
 
+  <!-- 感謝メッセージ -->
+  <div id="thanks-message" class="final-message">今までありがとう</div>
+  <div id="future-message" class="final-message">これからもよろしく</div>
+
   <!-- メインゲームキャンバス -->
   <canvas id="gameCanvas"></canvas>
 
@@ -40,14 +43,8 @@
     バラを3つ集めるたびに、ふたりの物語が進みます…
   </div>
 
-  <!-- 白フェード用レイヤー -->
-  <div id="whiteOverlay">
-    <div id="farewellMessage">今までありがとう</div>
-    <div id="futureMessage">これからもよろしく</div>
-  </div>
-
-  <!-- 動画再生 -->
-  <video id="proposeVideo" src="video/propose.mp4" style="display: none;" playsinline></video>
+  <!-- 動画 -->
+  <video id="finalVideo" src="video/propose.mp4" playsinline muted></video>
 
   <!-- 音声ファイル -->
   <audio id="bgm" src="audio/romantic.mp3" loop></audio>
@@ -55,7 +52,6 @@
   <audio id="jumpSound" src="audio/jump.mp3"></audio>
   <audio id="finalVoice" src="audio/shota_last.mp3"></audio>
 
-  <!-- ゲームロジック -->
   <script src="game.js"></script>
 </body>
 </html>
