@@ -1,4 +1,5 @@
-// --- 既存コード（省略なし） ---
+// 最新版 game.js（全演出含む、BGM、音声、粒子、シルエットすべて対応）
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const backgroundDiv = document.getElementById("background");
@@ -6,8 +7,7 @@ const poemDiv = document.getElementById("poem");
 const bgm = document.getElementById("bgm");
 const soccerAudio = document.getElementById("soccerAudio");
 const heartsContainer = document.getElementById("hearts");
-const silhouette = document.getElementById("silhouette");
-const particleContainer = document.getElementById("particle-container");
+const roseMessage = document.getElementById("rose-message");
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -69,7 +69,6 @@ let shota = {
 
 const gravity = 0.8;
 const jumpPower = -16;
-
 let touchStartX = 0;
 let touchStartY = 0;
 let touchInterval = null;
@@ -80,7 +79,6 @@ canvas.addEventListener("touchstart", e => {
   touchStartY = touch.clientY;
   const center = canvas.width / 2;
   const direction = touchStartX < center ? -1 : 1;
-
   touchInterval = setInterval(() => {
     shota.vx = 5 * direction;
   }, 16);
@@ -90,7 +88,6 @@ canvas.addEventListener("touchmove", e => {
   const touch = e.touches[0];
   const dx = touch.clientX - touchStartX;
   const dy = touchStartY - touch.clientY;
-
   if (dy > 50 && !shota.isJumping) {
     if (Math.abs(dx) > 30) {
       shota.vx = dx > 0 ? 5 : -5;
@@ -112,10 +109,7 @@ function resetItem(item) {
 }
 
 function isColliding(a, b) {
-  return a.x < b.x + b.width &&
-         a.x + a.width > b.x &&
-         a.y < b.y + b.height &&
-         a.y + a.height > b.y;
+  return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
 }
 
 function showHearts(count) {
@@ -126,14 +120,6 @@ function showHearts(count) {
     img.className = "heart-icon";
     heartsContainer.appendChild(img);
   }
-}
-
-function showPoem(text) {
-  poemDiv.innerText = text;
-  poemDiv.style.opacity = 1;
-  setTimeout(() => {
-    poemDiv.style.opacity = 0;
-  }, 2500);
 }
 
 function createPetal() {
@@ -157,38 +143,34 @@ function createHeartEffect(x, y) {
   }
 }
 
-function createParticles() {
-  for (let i = 0; i < 30; i++) {
-    const p = document.createElement("div");
-    p.className = "particle";
-    p.style.left = Math.random() * 100 + "vw";
-    p.style.top = Math.random() * 100 + "vh";
-    p.style.animationDuration = (8 + Math.random() * 4) + "s";
-    particleContainer.appendChild(p);
-  }
+function showSilhouette() {
+  const s = document.createElement("div");
+  s.className = "silhouette";
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), 4000);
 }
 
-function showSilhouette() {
-  silhouette.style.opacity = 0.7;
-  setTimeout(() => {
-    silhouette.style.opacity = 0;
-  }, 3000);
+function createBackgroundParticles() {
+  for (let i = 0; i < 30; i++) {
+    const star = document.createElement("div");
+    star.className = "background-particle";
+    star.style.left = `${Math.random() * 100}%`;
+    star.style.top = `${Math.random() * 100}%`;
+    document.body.appendChild(star);
+  }
 }
 
 function update() {
   shota.x += shota.vx;
   shota.y += shota.vy;
   shota.vy += gravity;
-
   if (shota.y >= canvas.height - shota.height - 60) {
     shota.y = canvas.height - shota.height - 60;
     shota.vy = 0;
     shota.isJumping = false;
   }
-
   if (shota.x < 0) shota.x = 0;
   if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
-
   [rose, ball].forEach(item => {
     item.y += item.speed;
     if (item.y > canvas.height) resetItem(item);
@@ -200,42 +182,41 @@ function update() {
     createHeartEffect(shota.x, shota.y);
     createPetal();
     showHearts(roseCount);
-
-    const messageIndex = Math.floor((roseCount - 1) / 2);
-    if (roseCount % 2 === 0 && backgroundIndex < backgrounds.length - 1) {
+    const messageIndex = Math.floor(roseCount / 2);
+    if ([1,3,5,7,9].includes(roseCount)) {
+      roseMessage.textContent = messages[(roseCount-1)/2];
+      roseMessage.classList.add("visible");
+      setTimeout(() => roseMessage.classList.remove("visible"), 4000);
+      const voice = new Audio(voiceAudios[(roseCount-1)/2]);
+      voice.play();
+    }
+    if ([2,4,6,8].includes(roseCount)) {
       backgroundIndex++;
       backgroundDiv.style.opacity = 0;
       setTimeout(() => {
         bgImage.src = backgrounds[backgroundIndex];
         backgroundDiv.style.backgroundImage = `url(${bgImage.src})`;
         backgroundDiv.style.opacity = 1;
-
-        if (roseCount === 10) {
-          showPoem("そして──翔太が決意した瞬間へ…");
-          new Audio("audio/shota_final.mp3").play();
-          for (let i = 0; i < 50; i++) setTimeout(createPetal, i * 50);
-        } else if (roseCount === 9) {
-          showPoem("次が最後の1輪…");
-        } else {
-          showPoem(messages[messageIndex] || "");
-          const voice = new Audio(voiceAudios[messageIndex]);
-          voice.play();
-        }
-
-        resetItem(rose);
-        resetItem(ball);
-
-        if (roseCount === 6) showSilhouette();
-
+        showSilhouette();
       }, 600);
+    }
+    if (roseCount === 9) {
+      poemDiv.innerText = "次が最後の1輪…";
+      poemDiv.style.opacity = 1;
+      setTimeout(() => poemDiv.style.opacity = 0, 3000);
+    }
+    if (roseCount === 10) {
+      new Audio("audio/shota_final.mp3").play();
+      for (let i = 0; i < 50; i++) setTimeout(createPetal, i * 50);
+      poemDiv.innerText = "そして──翔太が決意した瞬間へ…";
+      poemDiv.style.opacity = 1;
+      setTimeout(() => poemDiv.style.opacity = 0, 4000);
     }
   }
 
-  if (isColliding(shota, ball) && roseCount < 10) {
-    if (poemDiv.style.opacity === "0") {
-      soccerAudio.currentTime = 0;
-      soccerAudio.play();
-    }
+  if (isColliding(shota, ball) && roseCount < 10 && poemDiv.style.opacity === "0") {
+    soccerAudio.currentTime = 0;
+    soccerAudio.play();
     resetItem(ball);
   }
 }
@@ -253,7 +234,10 @@ function gameLoop() {
   draw();
   requestAnimationFrame(gameLoop);
 }
-gameLoop();
 
-createParticles();
-bgm.play();
+window.onload = () => {
+  createBackgroundParticles();
+  bgm.play();
+};
+
+gameLoop();
