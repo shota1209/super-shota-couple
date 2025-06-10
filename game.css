@@ -1,3 +1,4 @@
+/* 基本設定 */
 body, html {
   margin: 0;
   padding: 0;
@@ -6,6 +7,7 @@ body, html {
   font-family: 'Arial', sans-serif;
 }
 
+/* 背景画像 */
 #background {
   position: fixed;
   top: 0;
@@ -18,6 +20,7 @@ body, html {
   transition: opacity 1s ease;
 }
 
+/* 背景用光粒子 */
 #particle-container {
   position: fixed;
   width: 100%;
@@ -26,20 +29,20 @@ body, html {
   pointer-events: none;
 }
 
-.particle {
+.background-particle {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   background: white;
   border-radius: 50%;
-  opacity: 0.5;
+  opacity: 0.6;
   animation: floatParticle linear infinite;
 }
 
 @keyframes floatParticle {
   0% {
     transform: translateY(0);
-    opacity: 0.5;
+    opacity: 0.6;
   }
   100% {
     transform: translateY(100vh);
@@ -47,6 +50,7 @@ body, html {
   }
 }
 
+/* シルエット（固定表示） */
 #silhouette {
   position: absolute;
   bottom: 100px;
@@ -58,10 +62,27 @@ body, html {
   z-index: 5;
 }
 
-#silhouette.visible {
+/* シルエット（演出用にJSで追加される） */
+.silhouette {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
   opacity: 1;
+  width: 200px;
+  height: auto;
+  background: url("images/silhouette.png") no-repeat center center;
+  background-size: contain;
+  z-index: 6;
+  animation: fadeOut 4s forwards;
 }
 
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ゲームキャンバス */
 #gameCanvas {
   display: block;
   background: transparent;
@@ -69,6 +90,7 @@ body, html {
   z-index: 0;
 }
 
+/* ポエム */
 #poem {
   position: absolute;
   top: 50px;
@@ -81,6 +103,24 @@ body, html {
   z-index: 10;
 }
 
+/* バラごとのメッセージ */
+#rose-message {
+  position: absolute;
+  top: 100px;
+  width: 100%;
+  text-align: center;
+  font-size: 20px;
+  color: #ff99cc;
+  opacity: 0;
+  transition: opacity 1s;
+  z-index: 10;
+}
+
+#rose-message.visible {
+  opacity: 1;
+}
+
+/* ハートアイコン */
 #hearts {
   position: absolute;
   top: 10px;
@@ -95,6 +135,7 @@ body, html {
   margin-right: 5px;
 }
 
+/* 操作説明 */
 #instructions {
   position: absolute;
   bottom: 20px;
@@ -103,4 +144,24 @@ body, html {
   color: white;
   font-size: 14px;
   z-index: 10;
+}
+
+/* 花びらやハートの降下演出 */
+.petal {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  animation: fall 3s linear forwards;
+  z-index: 2;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
 }
