@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="game.css">
 </head>
 <body>
+
   <!-- スタートオーバーレイ -->
   <div id="startOverlay">
     <div id="startMessage">画面をタップしてスタート！<br>音声が再生されます</div>
@@ -39,12 +40,22 @@
     バラを3つ集めるたびに、ふたりの物語が進みます…
   </div>
 
+  <!-- 白フェード用レイヤー -->
+  <div id="whiteOverlay">
+    <div id="farewellMessage">今までありがとう</div>
+    <div id="futureMessage">これからもよろしく</div>
+  </div>
+
+  <!-- 動画再生 -->
+  <video id="proposeVideo" src="video/propose.mp4" style="display: none;" playsinline></video>
+
   <!-- 音声ファイル -->
   <audio id="bgm" src="audio/romantic.mp3" loop></audio>
   <audio id="soccerAudio" src="audio/soccer.mp3"></audio>
   <audio id="jumpSound" src="audio/jump.mp3"></audio>
-  <audio id="finalVoice" src="audio/shota_final.mp3"></audio>
+  <audio id="finalVoice" src="audio/shota_last.mp3"></audio>
 
+  <!-- ゲームロジック -->
   <script src="game.js"></script>
 </body>
 </html>
