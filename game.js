@@ -195,6 +195,16 @@ function update() {
     if ([1,3,5,7,9].includes(roseCount)) {
       roseMessage.textContent = messages[(roseCount-1)/2];
       roseMessage.classList.add("visible");
+      roseMessage.style.backgroundColor = "rgba(255, 182, 193, 0.8)";
+      roseMessage.style.color = "#fff";
+      roseMessage.style.padding = "10px 20px";
+      roseMessage.style.borderRadius = "10px";
+      roseMessage.style.position = "absolute";
+      roseMessage.style.top = "30%";
+      roseMessage.style.left = "50%";
+      roseMessage.style.transform = "translateX(-50%)";
+      roseMessage.style.zIndex = 20;
+      roseMessage.style.textAlign = "center";
       setTimeout(() => roseMessage.classList.remove("visible"), 4000);
       const voice = new Audio(voiceAudios[(roseCount-1)/2]);
       voice.play();
@@ -206,7 +216,8 @@ function update() {
         bgImage.src = backgrounds[backgroundIndex];
         backgroundDiv.style.backgroundImage = `url(${bgImage.src})`;
         backgroundDiv.style.opacity = 1;
-        showSilhouette();
+        document.getElementById("silhouette").classList.add("visible");
+        setTimeout(() => document.getElementById("silhouette").classList.remove("visible"), 4000);
         createBackgroundParticles();
       }, 600);
     }
@@ -216,7 +227,7 @@ function update() {
       setTimeout(() => poemDiv.style.opacity = 0, 3000);
     }
     if (roseCount === 10) {
-      new Audio("audio/shota_final.mp3").play();
+      new Audio("audio/shota_last.mp3").play();
       for (let i = 0; i < 50; i++) setTimeout(createPetal, i * 50);
       poemDiv.innerText = "そして──翔太が決意した瞬間へ…";
       poemDiv.style.opacity = 1;
