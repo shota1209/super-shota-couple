@@ -213,20 +213,28 @@ function updateBackground(newSrc) {
   }
 }
 
-
 // 10個目のバラを取った時の処理
 if (roseCount === 10) {
-  finalVoice.play();
+  finalVoice.play(); // 最後のセリフを再生
   fadeTransition(() => {
-    thanksMessage.classList.remove("hidden");
+    // 画面が白くなる（白背景のオーバーレイを表示）
+    whiteOverlay.classList.add("visible");
+
+    // 感謝メッセージの表示
     setTimeout(() => {
-      thanksMessage.classList.add("hidden");
-      futureMessage.classList.remove("hidden");
+      thanksMessage.classList.remove("hidden");
+      // さらに数秒後に未来のメッセージ表示
       setTimeout(() => {
-        futureMessage.classList.add("hidden");
-        playButton.style.display = 'block';  // ボタンを表示
-      }, 4000);  // メッセージが非表示になった後、ボタンを表示
-    }, 4000);  // 感謝メッセージ表示後4秒待つ
+        thanksMessage.classList.add("hidden");
+        futureMessage.classList.remove("hidden");
+
+        // 最後に未来のメッセージが表示された後、動画再生ボタンを表示
+        setTimeout(() => {
+          futureMessage.classList.add("hidden");
+          playButton.style.display = 'block'; // ボタンを表示
+        }, 4000); // 未来メッセージが表示された後4秒後にボタンを表示
+      }, 4000); // 感謝メッセージ表示後4秒後に未来メッセージ表示
+    }, 4000); // 白オーバーレイをフェードインした後、4秒後に感謝メッセージ表示
   });
 }
 
@@ -237,6 +245,7 @@ playButton.addEventListener('click', () => {
   const player = new Vimeo.Player(iframe);
   player.play();
 });
+
 
 function update() {
   shota.x += shota.vx;
