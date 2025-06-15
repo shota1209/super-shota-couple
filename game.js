@@ -197,14 +197,22 @@ function resumeItemsAnimation() {
 function updateBackground(newSrc) {
   const newImage = new Image();
   newImage.src = newSrc;
+
+  // 画像が読み込まれた後、背景を更新
   newImage.onload = function() {
-    backgroundDiv.style.opacity = 0;
+    console.log("背景画像が読み込まれました:", newSrc); // ログを追加
+    backgroundDiv.style.opacity = 0;  // フェードアウト
     setTimeout(() => {
       backgroundDiv.style.backgroundImage = `url(${newSrc})`;
-      backgroundDiv.style.opacity = 1;
-    }, 1000);
+      backgroundDiv.style.opacity = 1;  // フェードイン
+    }, 1000); // 1秒後にフェードイン
   };
+
+  newImage.onerror = function() {
+    console.error("背景画像の読み込みに失敗しました:", newSrc);
+  }
 }
+
 
 // 10個目のバラを取った時の処理
 if (roseCount === 10) {
