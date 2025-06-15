@@ -24,6 +24,7 @@ body, html {
   background-position: center;
   z-index: -2;
   transition: opacity 1s ease;
+  opacity: 1; /* 背景が初期状態で表示 */
 }
 
 #pinkOverlay {
