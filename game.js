@@ -158,16 +158,23 @@ function createPetal() {
 }
 
 function createHeartEffect(x, y) {
-  for (let i = 0; i < 5; i++) {
+  // shotaの周りに小さなハートを表示
+  for (let i = 0; i < 5; i++) {  // 5個のハートを生成
     const heart = document.createElement("img");
     heart.src = "images/heart.png";
     heart.className = "petal";
-    heart.style.left = x + (Math.random() * 40 - 20) + "px";
-    heart.style.top = y + (Math.random() * 40 - 20) + "px";
+
+    // shotaの周りにハートを配置
+    heart.style.left = (x + Math.random() * 40 - 20) + "px";  // shotaの周りにランダム配置
+    heart.style.top = (y + Math.random() * 40 - 20) + "px";   // shotaの周りにランダム配置
+
     document.body.appendChild(heart);
+
+    // 3秒後に削除
     setTimeout(() => heart.remove(), 3000);
   }
 }
+
 
 function fadeTransition(callback) {
   if (whiteOverlay.classList.contains("visible")) return;
