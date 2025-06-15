@@ -80,7 +80,6 @@ let touchStartX = 0;
 let touchStartY = 0;
 let touchInterval = null;
 
-// タッチイベントでBGMを再生するように変更
 let bgmStarted = false;
 
 canvas.addEventListener("touchstart", e => {
@@ -94,10 +93,9 @@ canvas.addEventListener("touchstart", e => {
     shota.vx = 5 * direction;
   }, 16);
 
-  // BGMを再生
   if (!bgmStarted) {
     bgm.play();
-    bgmStarted = true; // BGMが再生されたフラグを立てる
+    bgmStarted = true;
   }
 }, { passive: false });
 
@@ -168,48 +166,47 @@ function createHeartEffect(x, y) {
   }
 }
 
-// fadeTransitionを修正してピンク色のオーバーレイと背景遷移を実装
 function fadeTransition(callback) {
-  // 既にオーバーレイが表示されている場合は何もしない
   if (whiteOverlay.classList.contains("visible")) return;
-
-  whiteOverlay.classList.add("visible"); // ピンク色オーバーレイを表示
-
+  whiteOverlay.classList.add("visible");
   setTimeout(() => {
-    callback(); // 背景の更新
-
-    // 背景更新後、1秒後にオーバーレイを非表示にする
+    callback();
     setTimeout(() => whiteOverlay.classList.remove("visible"), 600);
-  }, 600); // 背景更新までに遅延を設定
+  }, 600);
 }
 
-// アイテムアニメーションを停止
 function stopItemsAnimation() {
   rose.speed = 0;
   ball.speed = 0;
 }
 
-// アイテムアニメーション再開
 function resumeItemsAnimation() {
   rose.speed = 3;
   ball.speed = 3;
 }
 
-// バラを取ったときに背景が変更される
-if ([2, 4, 6, 8].includes(roseCount)) {
-  backgroundIndex++;
-  stopItemsAnimation();  // アニメーションを停止
-  fadeTransition(() => {
-    const newSrc = backgrounds[backgroundIndex];
-    bgImage.src = newSrc;
-    bgImage.onload = () => {  // 画像が読み込まれたら背景を更新
+function updateBackground(newSrc) {
+  const newImage = new Image();
+  newImage.src = newSrc;
+  newImage.onload = function() {
+    backgroundDiv.style.opacity = 0;
+    setTimeout(() => {
       backgroundDiv.style.backgroundImage = `url(${newSrc})`;
-    };
-  });
-  setTimeout(resumeItemsAnimation, 1200); // アニメーションを再開
+      backgroundDiv.style.opacity = 1;
+    }, 1000);
+  };
 }
 
-// 10個目のバラを取った後に白い画面を表示
+if ([2, 4, 6, 8, 10].includes(roseCount)) {
+  backgroundIndex++;
+  stopItemsAnimation();
+  fadeTransition(() => {
+    const newSrc = backgrounds[backgroundIndex];
+    updateBackground(newSrc);
+  });
+  setTimeout(resumeItemsAnimation, 1200);
+}
+
 if (roseCount === 10) {
   finalVoice.play();
   fadeTransition(() => {
@@ -255,10 +252,6 @@ function update() {
       const voice = new Audio(voiceAudios[(roseCount - 1) / 2]);
       voice.play();
     }
-
-    if (roseCount === 10) {
-      // 最後のバラでの処理
-    }
   }
 
   if (isColliding(shota, ball) && roseCount < 10) {
@@ -283,6 +276,6 @@ function gameLoop() {
 }
 
 window.onload = () => {
-  bgm.play(); // BGM自動再生
+  bgm.play();
 };
 gameLoop();
