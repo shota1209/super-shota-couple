@@ -15,6 +15,12 @@ const futureMessage = document.getElementById("future-message");
 const finalVoice = document.getElementById("finalVoice");
 const whiteOverlay = document.getElementById("whiteOverlay");
 
+const playButton = document.getElementById('playButton');
+const videoContainer = document.getElementById('videoContainer');
+const iframe = document.getElementById('vimeoPlayer');
+
+let bgmStarted = false;
+
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight - 60;
@@ -78,8 +84,6 @@ const jumpPower = -16;
 let touchStartX = 0;
 let touchStartY = 0;
 let touchInterval = null;
-
-let bgmStarted = false;
 
 canvas.addEventListener("touchstart", e => {
   e.preventDefault();
@@ -215,12 +219,19 @@ if (roseCount === 10) {
       futureMessage.classList.remove("hidden");
       setTimeout(() => {
         futureMessage.classList.add("hidden");
-        finalVideo.style.display = "block";
-        finalVideo.play();
+        playButton.style.display = 'block';  // ボタンを表示
       }, 4000);
     }, 4000);
   });
 }
+
+// 動画再生ボタンの処理
+playButton.addEventListener('click', () => {
+  playButton.style.display = 'none';  // ボタンを非表示
+  videoContainer.style.display = 'block';  // 動画を表示
+  const player = new Vimeo.Player(iframe);
+  player.play();
+});
 
 function update() {
   shota.x += shota.vx;
@@ -254,25 +265,4 @@ function update() {
   }
 
   if (isColliding(shota, ball) && roseCount < 10) {
-    soccerAudio.currentTime = 0;
-    soccerAudio.play();
-    resetItem(ball);
-  }
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
-  ctx.drawImage(shotaImg, shota.x, shota.y, shota.width, shota.height);
-  ctx.drawImage(roseImg, rose.x, rose.y, rose.width, rose.height);
-  ctx.drawImage(ballImg, ball.x, ball.y, ball.width, ball.height);
-}
-
-function gameLoop() {
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
-}
-
-window.onload = () => {
-  bgm.play();
+    soccerAudio.currentTime =
