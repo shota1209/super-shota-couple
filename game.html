@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -39,8 +38,18 @@
     バラを3つ集めるたびに、ふたりの物語が進みます…
   </div>
 
-  <!-- 動画 -->
-  <video id="finalVideo" src="video/propose.mp4" playsinline muted></video>
+  <!-- 動画再生ボタン -->
+  <button id="playButton">動画を再生</button>
+
+  <!-- Vimeo埋め込み動画 -->
+  <div id="videoContainer" style="padding: 177.78% 0 0 0; position: relative; display: none;">
+    <iframe id="vimeoPlayer" src="https://player.vimeo.com/video/1093447380?h=b61f35b376&badge=0&autopause=0&player_id=0&app_id=58479" 
+            frameborder="0" 
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" 
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+            title="propose">
+    </iframe>
+  </div>
 
   <!-- 音声ファイル -->
   <audio id="bgm" src="audio/romantic.mp3" loop autoplay></audio>
@@ -48,6 +57,7 @@
   <audio id="jumpSound" src="audio/jump.mp3"></audio>
   <audio id="finalVoice" src="audio/shota_last.mp3"></audio>
 
+  <script src="https://player.vimeo.com/api/player.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
