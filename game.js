@@ -1,4 +1,3 @@
-
 // === 最新版 game.js ===
 // 感謝メッセージ制御、BGM・効果音・画面遷移バグ修正済み
 
@@ -91,6 +90,11 @@ canvas.addEventListener("touchstart", e => {
   touchInterval = setInterval(() => {
     shota.vx = 5 * direction;
   }, 16);
+
+  // BGMを再生
+  if (!bgm.playing) {
+    bgm.play();
+  }
 }, { passive: false });
 
 canvas.addEventListener("touchmove", e => {
