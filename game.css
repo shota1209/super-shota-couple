@@ -154,3 +154,7 @@ body, html {
   z-index: 40;
   display: none;
 }
+
+.hidden {
+  display: none;
+}
