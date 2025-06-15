@@ -1,224 +1,158 @@
-// === 最新版 game.js ===
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-const backgroundDiv = document.getElementById("background");
-const poemDiv = document.getElementById("poem");
-const bgm = document.getElementById("bgm");
-const soccerAudio = document.getElementById("soccerAudio");
-const jumpSound = document.getElementById("jumpSound");
-const heartsContainer = document.getElementById("hearts");
-const roseMessage = document.getElementById("rose-message");
-const thanksMessage = document.getElementById("thanks-message");
-const futureMessage = document.getElementById("future-message");
-const finalVoice = document.getElementById("finalVoice");
-const whiteOverlay = document.getElementById("whiteOverlay");
-
-const playButton = document.getElementById('playButton');
-const videoContainer = document.getElementById('videoContainer');
-const iframe = document.getElementById('vimeoPlayer');
-
-let bgmStarted = false;
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight - 60;
-}
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-
-const shotaImg = new Image();
-shotaImg.src = "images/shota.png";
-const roseImg = new Image();
-roseImg.src = "images/rose.png";
-const ballImg = new Image();
-ballImg.src = "images/ball.png";
-const heartIcon = "images/heart.png";
-
-const backgrounds = [
-  "images/bg1.png",
-  "images/bg2.png",
-  "images/bg3.png",
-  "images/bg4.png",
-  "images/bg5.png"
-];
-
-const messages = [
-  "付き合ってください",
-  "今度はランドも行こ〜",
-  "キャンプで寝てごめん",
-  "また海外行こ〜",
-  "次は諏訪湖の花火だね"
-];
-
-const voiceAudios = [
-  "audio/rose1.mp3",
-  "audio/rose3.mp3",
-  "audio/rose5.mp3",
-  "audio/rose7.mp3",
-  "audio/rose9.mp3"
-];
-
-let roseCount = 0;
-let backgroundIndex = 0;
-let bgImage = new Image();
-bgImage.src = backgrounds[0];
-let rose = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
-let ball = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
-resetItem(rose);
-resetItem(ball);
-
-let shota = {
-  x: canvas.width / 2,
-  y: canvas.height - 160,
-  width: 80,
-  height: 80,
-  vx: 0,
-  vy: 0,
-  isJumping: false
-};
-
-const gravity = 0.8;
-const jumpPower = -16;
-let touchStartX = 0;
-let touchStartY = 0;
-let touchInterval = null;
-
-canvas.addEventListener("touchstart", e => {
-  e.preventDefault();
-  const touch = e.touches[0];
-  touchStartX = touch.clientX;
-  touchStartY = touch.clientY;
-  const center = canvas.width / 2;
-  const direction = touchStartX < center ? -1 : 1;
-  touchInterval = setInterval(() => {
-    shota.vx = 5 * direction;
-  }, 16);
-
-  if (!bgmStarted) {
-    bgm.play();
-    bgmStarted = true;
-  }
-}, { passive: false });
-
-canvas.addEventListener("touchmove", e => {
-  e.preventDefault();
-  const touch = e.touches[0];
-  const dx = touch.clientX - touchStartX;
-  const dy = touchStartY - touch.clientY;
-  if (dy > 50 && !shota.isJumping) {
-    if (Math.abs(dx) > 30) {
-      shota.vx = dx > 0 ? 5 : -5;
-    }
-    shota.vy = jumpPower;
-    shota.isJumping = true;
-    jumpSound.currentTime = 0;
-    jumpSound.play();
-  }
-}, { passive: false });
-
-canvas.addEventListener("touchend", () => {
-  clearInterval(touchInterval);
-  shota.vx = 0;
-}, { passive: false });
-
-function resetItem(item) {
-  item.x = Math.random() * (canvas.width - item.width);
-  item.y = -Math.random() * canvas.height;
+#videoContainer {
+  display: none;
 }
 
-function isColliding(a, b) {
-  return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: black;
+  font-family: 'Arial', sans-serif;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
-function showHearts(count) {
-  heartsContainer.innerHTML = "";
-  for (let i = 0; i < count; i++) {
-    const img = document.createElement("img");
-    img.src = heartIcon;
-    img.className = "heart-icon";
-    heartsContainer.appendChild(img);
-  }
+#background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  z-index: -2;
+  transition: opacity 1s ease;
 }
 
-function showRoseMessage(text) {
-  roseMessage.textContent = text;
-  roseMessage.classList.add("visible");
-  setTimeout(() => roseMessage.classList.remove("visible"), 4000);
+#pinkOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 192, 203, 0.6);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 1s ease;
+  pointer-events: none;
 }
 
-function fadeTransition(callback) {
-  if (whiteOverlay.classList.contains("visible")) return;
-  whiteOverlay.classList.add("visible");
-  setTimeout(() => {
-    callback();
-    setTimeout(() => whiteOverlay.classList.remove("visible"), 600);
-  }, 600);
+#particle-container {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
 }
 
-// 背景画像を更新
-function updateBackground(newSrc) {
-  const newImage = new Image();
-  newImage.src = newSrc;
-  newImage.onload = function() {
-    backgroundDiv.style.opacity = 0;
-    setTimeout(() => {
-      backgroundDiv.style.backgroundImage = `url(${newSrc})`;
-      backgroundDiv.style.opacity = 1;
-    }, 1000);
-  };
+.background-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: floatParticle linear infinite;
 }
 
-// バラを取った後の背景の更新
-if ([2, 4, 6, 8, 10].includes(roseCount)) {
-  backgroundIndex++;
-  stopItemsAnimation();
-  fadeTransition(() => {
-    const newSrc = backgrounds[backgroundIndex];
-    updateBackground(newSrc);
-  });
-  setTimeout(resumeItemsAnimation, 1200);
+@keyframes floatParticle {
+  0% { transform: translateY(0); opacity: 0.5; }
+  100% { transform: translateY(100vh); opacity: 0; }
 }
 
-// 10個目のバラを取った後に動画再生ボタン表示
-if (roseCount === 10) {
-  finalVoice.play();
-  fadeTransition(() => {
-    thanksMessage.classList.remove("hidden");
-    setTimeout(() => {
-      thanksMessage.classList.add("hidden");
-      futureMessage.classList.remove("hidden");
-      setTimeout(() => {
-        futureMessage.classList.add("hidden");
-        playButton.style.display = 'block'; // ボタン表示
-      }, 4000);
-    }, 4000);
-  });
+#gameCanvas {
+  display: block;
+  background: transparent;
+  position: relative;
+  z-index: 0;
 }
 
-// 動画再生ボタンの処理
-playButton.addEventListener('click', () => {
-  playButton.style.display = 'none';  // ボタンを非表示
-  videoContainer.style.display = 'block';  // 動画を表示
-  const player = new Vimeo.Player(iframe);
-  player.play();  // 動画再生
-});
-
-function update() {
-  // ゲームの更新処理
+#rose-message {
+  position: absolute;
+  top: 40%;
+  width: 100%;
+  text-align: center;
+  font-size: 28px;
+  color: pink;
+  font-family: 'Georgia', serif;
+  opacity: 0;
+  transition: opacity 1s ease;
+  text-shadow: 0 0 10px white;
+  z-index: 20;
 }
 
-function draw() {
-  // ゲームの描画処理
+#rose-message.visible {
+  opacity: 1;
 }
 
-function gameLoop() {
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
+.final-message {
+  position: absolute;
+  top: 40%;
+  width: 100%;
+  text-align: center;
+  font-size: 36px;
+  color: pink;
+  font-family: 'Georgia', serif;
+  white-space: pre-line;
+  opacity: 0;
+  z-index: 30;
+  animation: fadeText 2s ease forwards;
 }
 
-window.onload = () => {
-  bgm.play();
-};
+@keyframes fadeText {
+  0% { opacity: 0; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
 
-gameLoop();
+#finalVideo {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+  z-index: 40;
+  display: none;
+}
+
+.hidden {
+  display: none;
+}
+
+#whiteOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 192, 203, 0.8);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 1s ease;
+  pointer-events: none;
+}
+
+.whiteOverlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#playButton {
+  display: block;
+  background-color: pink;
+  padding: 10px 20px;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+  z-index: 50;
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translateX(-50%);
+}
