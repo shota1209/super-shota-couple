@@ -49,6 +49,13 @@ body, html {
   height: 20px; /* サイズを小さく */
   position: absolute;
 }
+
+.heart-icon {
+  width: 30px;  /* サイズを小さく設定 */
+  height: 30px; /* サイズを小さく設定 */
+  margin-right: 5px;
+}
+
 #particle-container {
   position: fixed;
   width: 100%;
