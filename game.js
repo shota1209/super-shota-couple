@@ -202,7 +202,9 @@ if ([2, 4, 6, 8].includes(roseCount)) {
   fadeTransition(() => {
     const newSrc = backgrounds[backgroundIndex];
     bgImage.src = newSrc;
-    backgroundDiv.style.backgroundImage = `url(${newSrc})`;
+    bgImage.onload = () => {  // 画像が読み込まれたら背景を更新
+      backgroundDiv.style.backgroundImage = `url(${newSrc})`;
+    };
   });
   setTimeout(resumeItemsAnimation, 1200); // アニメーションを再開
 }
