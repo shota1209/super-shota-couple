@@ -1,3 +1,4 @@
+/* #videoContainer の初期状態 */
 #videoContainer {
   display: none;
   position: fixed;
@@ -8,18 +9,7 @@
   z-index: 50;
 }
 
-body, html {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: black;
-  font-family: 'Arial', sans-serif;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  user-select: none;
-  touch-action: manipulation;
-}
-
+/* 背景画像に関する設定 */
 #background {
   position: fixed;
   top: 0;
@@ -29,9 +19,10 @@ body, html {
   background-size: cover;
   background-position: center;
   z-index: -2;
-  transition: opacity 1s ease;
+  transition: opacity 1s ease; /* 画像の切り替え時にフェード */
 }
 
+/* ピンクのオーバーレイ */
 #pinkOverlay {
   position: fixed;
   top: 0;
@@ -44,18 +35,41 @@ body, html {
   transition: opacity 1s ease;
   pointer-events: none;
 }
+
+/* ハートの小さなアイコン設定 */
 .petal {
-  width: 20px;  /* サイズを小さく */
-  height: 20px; /* サイズを小さく */
+  width: 20px; /* 小さいサイズ */
+  height: 20px;
   position: absolute;
 }
 
 .heart-icon {
-  width: 30px;  /* サイズを小さく設定 */
-  height: 30px; /* サイズを小さく設定 */
+  width: 30px; /* 小さいサイズ */
+  height: 30px;
   margin-right: 5px;
 }
 
+/* 指示メッセージ */
+#instructions {
+  position: absolute;
+  bottom: 20px;  /* 画面下部 */
+  width: 100%;
+  text-align: center;
+  color: white;
+  font-size: 18px;
+  z-index: 20;
+  background-color: rgba(255, 192, 203, 0.7);
+  padding: 10px;
+  border-radius: 10px;
+  transition: opacity 1s ease; /* フェードイン・フェードアウト */
+}
+
+/* 透明度変更用 */
+#instructions.hidden {
+  opacity: 0; /* 非表示にする */
+}
+
+/* パーティクルの設定 */
 #particle-container {
   position: fixed;
   width: 100%;
@@ -74,24 +88,12 @@ body, html {
   animation: floatParticle linear infinite;
 }
 
-#instructions {
-  position: absolute;
-  bottom: 20px; /* 下部に配置 */
-  width: 100%; /* 横幅を100%に */
-  text-align: center; /* 中央寄せ */
-  color: white; /* 文字色を白に */
-  font-size: 18px; /* フォントサイズを調整 */
-  z-index: 20; /* 他の要素の上に表示 */
-  background-color: rgba(255, 192, 203, 0.7); /* 半透明の背景色 */
-  padding: 10px; /* 少し余白を取る */
-  border-radius: 10px; /* 角を丸くする */
-}
-
 @keyframes floatParticle {
   0% { transform: translateY(0); opacity: 0.5; }
   100% { transform: translateY(100vh); opacity: 0; }
 }
 
+/* ゲームキャンバス */
 #gameCanvas {
   display: block;
   background: transparent;
@@ -99,6 +101,7 @@ body, html {
   z-index: 0;
 }
 
+/* 文字メッセージの表示 */
 #rose-message {
   position: absolute;
   top: 40%;
@@ -117,6 +120,7 @@ body, html {
   opacity: 1;
 }
 
+/* 感謝メッセージ */
 .final-message {
   position: absolute;
   top: 40%;
@@ -137,6 +141,7 @@ body, html {
   100% { opacity: 0; transform: scale(1.05); }
 }
 
+/* 最後の動画再生 */
 #finalVideo {
   position: fixed;
   top: 50%;
@@ -149,10 +154,7 @@ body, html {
   display: none;
 }
 
-.hidden {
-  display: none;
-}
-
+/* 白いオーバーレイの表示 */
 #whiteOverlay {
   position: fixed;
   top: 0;
@@ -171,6 +173,7 @@ body, html {
   pointer-events: all;
 }
 
+/* 動画再生ボタン */
 #playButton {
   display: block;
   background-color: pink;
