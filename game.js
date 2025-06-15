@@ -1,59 +1,278 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>Super Shota Couple - ゲーム</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="game.css">
-</head>
-<body>
-  <!-- フェード演出用白背景 -->
-  <div id="whiteOverlay"></div>
+// === 最新版 game.js ===
+// 感謝メッセージ制御、BGM・効果音・画面遷移バグ修正済み
 
-  <!-- 背景 -->
-  <div id="background"></div>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const backgroundDiv = document.getElementById("background");
+const poemDiv = document.getElementById("poem");
+const bgm = document.getElementById("bgm");
+const soccerAudio = document.getElementById("soccerAudio");
+const jumpSound = document.getElementById("jumpSound");
+const heartsContainer = document.getElementById("hearts");
+const roseMessage = document.getElementById("rose-message");
+const thanksMessage = document.getElementById("thanks-message");
+const futureMessage = document.getElementById("future-message");
+const finalVoice = document.getElementById("finalVoice");
+const whiteOverlay = document.getElementById("whiteOverlay");
 
-  <!-- 光の粒子コンテナ -->
-  <div id="particle-container"></div>
+const playButton = document.getElementById('playButton');
+const videoContainer = document.getElementById('videoContainer');
+const iframe = document.getElementById('vimeoPlayer');
 
-  <!-- ハートUI -->
-  <div id="hearts"></div>
+let bgmStarted = false;
 
-  <!-- ポエム -->
-  <div id="poem"></div>
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight - 60;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
-  <!-- メッセージ表示 -->
-  <div id="rose-message"></div>
+const shotaImg = new Image();
+shotaImg.src = "images/shota.png";
+const roseImg = new Image();
+roseImg.src = "images/rose.png";
+const ballImg = new Image();
+ballImg.src = "images/ball.png";
+const heartIcon = "images/heart.png";
 
-  <!-- 感謝メッセージ（初期状態で非表示） -->
-  <div id="thanks-message" class="final-message hidden">今まで<br>ありがとう</div>
-  <div id="future-message" class="final-message hidden">これからも<br>よろしく</div>
+const backgrounds = [
+  "images/bg1.png",
+  "images/bg2.png",
+  "images/bg3.png",
+  "images/bg4.png",
+  "images/bg5.png"
+];
 
-  <!-- メインゲームキャンバス -->
-  <canvas id="gameCanvas"></canvas>
+const messages = [
+  "付き合ってください",
+  "今度はランドも行こ〜",
+  "キャンプで寝てごめん",
+  "また海外行こ〜",
+  "次は諏訪湖の花火だね"
+];
 
-  <!-- 操作説明 -->
-  <div id="instructions">
-    ←→長押しで移動 / ↑スワイプでジャンプ<br>
-    バラを3つ集めるたびに、ふたりの物語が進みます…
-  </div>
+const voiceAudios = [
+  "audio/rose1.mp3",
+  "audio/rose3.mp3",
+  "audio/rose5.mp3",
+  "audio/rose7.mp3",
+  "audio/rose9.mp3"
+];
 
-  <!-- Vimeo動画（最初は非表示） -->
-  <div id="videoContainer" style="display:none;">
-    <div style="padding:177.78% 0 0 0;position:relative;">
-      <iframe id="vimeoPlayer" src="https://player.vimeo.com/video/1093447380?h=b61f35b376&badge=0&autopause=0&player_id=0&app_id=58479" frameborder="0" allow="fullscreen" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="propose"></iframe>
-    </div>
-  </div>
+let roseCount = 0;
+let backgroundIndex = 0;
+let bgImage = new Image();
+bgImage.src = backgrounds[0];
+let rose = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
+let ball = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
+resetItem(rose);
+resetItem(ball);
 
-  <!-- 音声ファイル -->
-  <audio id="bgm" src="audio/romantic.mp3" loop autoplay></audio>
-  <audio id="soccerAudio" src="audio/soccer.mp3"></audio>
-  <audio id="jumpSound" src="audio/jump.mp3"></audio>
-  <audio id="finalVoice" src="audio/shota_last.mp3"></audio>
+let shota = {
+  x: canvas.width / 2,
+  y: canvas.height - 160,
+  width: 80,
+  height: 80,
+  vx: 0,
+  vy: 0,
+  isJumping: false
+};
 
-  <!-- 再生ボタン -->
-  <button id="playButton" style="display:none;">動画を再生</button>
+const gravity = 0.8;
+const jumpPower = -16;
+let touchStartX = 0;
+let touchStartY = 0;
+let touchInterval = null;
 
-  <script src="game.js"></script>
-</body>
-</html>
+canvas.addEventListener("touchstart", e => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  const center = canvas.width / 2;
+  const direction = touchStartX < center ? -1 : 1;
+  touchInterval = setInterval(() => {
+    shota.vx = 5 * direction;
+  }, 16);
+
+  if (!bgmStarted) {
+    bgm.play();
+    bgmStarted = true;
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchmove", e => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  const dx = touch.clientX - touchStartX;
+  const dy = touchStartY - touch.clientY;
+  if (dy > 50 && !shota.isJumping) {
+    if (Math.abs(dx) > 30) {
+      shota.vx = dx > 0 ? 5 : -5;
+    }
+    shota.vy = jumpPower;
+    shota.isJumping = true;
+    jumpSound.currentTime = 0;
+    jumpSound.play();
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => {
+  clearInterval(touchInterval);
+  shota.vx = 0;
+}, { passive: false });
+
+function resetItem(item) {
+  item.x = Math.random() * (canvas.width - item.width);
+  item.y = -Math.random() * canvas.height;
+}
+
+function isColliding(a, b) {
+  return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+}
+
+function showHearts(count) {
+  heartsContainer.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const img = document.createElement("img");
+    img.src = heartIcon;
+    img.className = "heart-icon";
+    heartsContainer.appendChild(img);
+  }
+}
+
+function showRoseMessage(text) {
+  roseMessage.textContent = text;
+  roseMessage.classList.add("visible");
+  setTimeout(() => roseMessage.classList.remove("visible"), 4000);
+}
+
+function createPetal() {
+  const petal = document.createElement("img");
+  petal.src = "images/petal.png";
+  petal.className = "petal";
+  petal.style.left = Math.random() * window.innerWidth + "px";
+  document.body.appendChild(petal);
+  setTimeout(() => petal.remove(), 3000);
+}
+
+function createHeartEffect(x, y) {
+  for (let i = 0; i < 5; i++) {
+    const heart = document.createElement("img");
+    heart.src = "images/heart.png";
+    heart.className = "petal";
+    heart.style.left = x + (Math.random() * 40 - 20) + "px";
+    heart.style.top = y + (Math.random() * 40 - 20) + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 3000);
+  }
+}
+
+function fadeTransition(callback) {
+  if (whiteOverlay.classList.contains("visible")) return;
+  whiteOverlay.classList.add("visible");
+  setTimeout(() => {
+    callback();
+    setTimeout(() => whiteOverlay.classList.remove("visible"), 600);
+  }, 600);
+}
+
+function stopItemsAnimation() {
+  rose.speed = 0;
+  ball.speed = 0;
+}
+
+function resumeItemsAnimation() {
+  rose.speed = 3;
+  ball.speed = 3;
+}
+
+function updateBackground(newSrc) {
+  const newImage = new Image();
+  newImage.src = newSrc;
+  newImage.onload = function() {
+    backgroundDiv.style.opacity = 0;
+    setTimeout(() => {
+      backgroundDiv.style.backgroundImage = url(${newSrc});
+      backgroundDiv.style.opacity = 1;
+    }, 1000);
+  };
+}
+
+if ([2, 4, 6, 8, 10].includes(roseCount)) {
+  backgroundIndex++;
+  stopItemsAnimation();
+  fadeTransition(() => {
+    const newSrc = backgrounds[backgroundIndex];
+    updateBackground(newSrc);
+  });
+  setTimeout(resumeItemsAnimation, 1200);
+}
+
+if (roseCount === 10) {
+  finalVoice.play();
+  fadeTransition(() => {
+    thanksMessage.classList.remove("hidden");
+    setTimeout(() => {
+      thanksMessage.classList.add("hidden");
+      futureMessage.classList.remove("hidden");
+      setTimeout(() => {
+        futureMessage.classList.add("hidden");
+        playButton.style.display = 'block';  // ボタンを表示
+      }, 4000);
+    }, 4000);
+  });
+}
+
+// 動画再生ボタンの処理
+playButton.addEventListener('click', () => {
+  playButton.style.display = 'none';  // ボタンを非表示
+  videoContainer.style.display = 'block';  // 動画を表示
+  const player = new Vimeo.Player(iframe);
+  player.play();
+});
+
+function update() {
+  shota.x += shota.vx;
+  shota.y += shota.vy;
+  shota.vy += gravity;
+  if (shota.y >= canvas.height - shota.height - 60) {
+    shota.y = canvas.height - shota.height - 60;
+    shota.vy = 0;
+    shota.isJumping = false;
+  }
+  if (shota.x < 0) shota.x = 0;
+  if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
+
+  [rose, ball].forEach(item => {
+    item.y += item.speed;
+    if (item.y > canvas.height) resetItem(item);
+  });
+
+  if (isColliding(shota, rose)) {
+    roseCount++;
+    resetItem(rose);
+    createHeartEffect(shota.x, shota.y);
+    createPetal();
+    showHearts(roseCount);
+
+    if ([1, 3, 5, 7, 9].includes(roseCount)) {
+      showRoseMessage(messages[(roseCount - 1) / 2]);
+      const voice = new Audio(voiceAudios[(roseCount - 1) / 2]);
+      voice.play();
+    }
+  }
+
+  if (isColliding(shota, ball) && roseCount < 10) {
+    soccerAudio.currentTime = 0;
+    soccerAudio.play();
+    resetItem(ball);
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(shotaImg, shota.x, shota.y, shota.width, shota.height);
+  ctx.draw
