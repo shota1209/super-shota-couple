@@ -1,4 +1,6 @@
 // === 最新版 game.js ===
+// 感謝メッセージ制御、BGM・効果音・画面遷移バグ修正済み
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const backgroundDiv = document.getElementById("background");
@@ -83,7 +85,6 @@ let touchStartX = 0;
 let touchStartY = 0;
 let touchInterval = null;
 
-// タッチイベント処理
 canvas.addEventListener("touchstart", e => {
   e.preventDefault();
   const touch = e.touches[0];
@@ -147,7 +148,27 @@ function showRoseMessage(text) {
   setTimeout(() => roseMessage.classList.remove("visible"), 4000);
 }
 
-// 背景変更処理
+function createPetal() {
+  const petal = document.createElement("img");
+  petal.src = "images/petal.png";
+  petal.className = "petal";
+  petal.style.left = Math.random() * window.innerWidth + "px";
+  document.body.appendChild(petal);
+  setTimeout(() => petal.remove(), 3000);
+}
+
+function createHeartEffect(x, y) {
+  for (let i = 0; i < 5; i++) {
+    const heart = document.createElement("img");
+    heart.src = "images/heart.png";
+    heart.className = "petal";
+    heart.style.left = x + (Math.random() * 40 - 20) + "px";
+    heart.style.top = y + (Math.random() * 40 - 20) + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 3000);
+  }
+}
+
 function fadeTransition(callback) {
   if (whiteOverlay.classList.contains("visible")) return;
   whiteOverlay.classList.add("visible");
@@ -157,19 +178,28 @@ function fadeTransition(callback) {
   }, 600);
 }
 
+function stopItemsAnimation() {
+  rose.speed = 0;
+  ball.speed = 0;
+}
+
+function resumeItemsAnimation() {
+  rose.speed = 3;
+  ball.speed = 3;
+}
+
 function updateBackground(newSrc) {
   const newImage = new Image();
   newImage.src = newSrc;
   newImage.onload = function() {
     backgroundDiv.style.opacity = 0;
     setTimeout(() => {
-      backgroundDiv.style.backgroundImage = `url(${newSrc})`;
+      backgroundDiv.style.backgroundImage = url(${newSrc});
       backgroundDiv.style.opacity = 1;
     }, 1000);
   };
 }
 
-// バラを取った後の背景の更新
 if ([2, 4, 6, 8, 10].includes(roseCount)) {
   backgroundIndex++;
   stopItemsAnimation();
@@ -180,7 +210,6 @@ if ([2, 4, 6, 8, 10].includes(roseCount)) {
   setTimeout(resumeItemsAnimation, 1200);
 }
 
-// 10個目のバラを取った後に動画再生ボタン表示
 if (roseCount === 10) {
   finalVoice.play();
   fadeTransition(() => {
@@ -190,36 +219,60 @@ if (roseCount === 10) {
       futureMessage.classList.remove("hidden");
       setTimeout(() => {
         futureMessage.classList.add("hidden");
-        playButton.style.display = 'block'; // ボタン表示
-      }, 4000); // メッセージ後に4秒待つ
+        playButton.style.display = 'block';  // ボタンを表示
+      }, 4000);
     }, 4000);
   });
 }
 
-// 動画再生ボタンのクリックイベント
+// 動画再生ボタンの処理
 playButton.addEventListener('click', () => {
   playButton.style.display = 'none';  // ボタンを非表示
   videoContainer.style.display = 'block';  // 動画を表示
   const player = new Vimeo.Player(iframe);
-  player.play();  // 動画再生
+  player.play();
 });
 
 function update() {
-  // ゲームの更新処理
+  shota.x += shota.vx;
+  shota.y += shota.vy;
+  shota.vy += gravity;
+  if (shota.y >= canvas.height - shota.height - 60) {
+    shota.y = canvas.height - shota.height - 60;
+    shota.vy = 0;
+    shota.isJumping = false;
+  }
+  if (shota.x < 0) shota.x = 0;
+  if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
+
+  [rose, ball].forEach(item => {
+    item.y += item.speed;
+    if (item.y > canvas.height) resetItem(item);
+  });
+
+  if (isColliding(shota, rose)) {
+    roseCount++;
+    resetItem(rose);
+    createHeartEffect(shota.x, shota.y);
+    createPetal();
+    showHearts(roseCount);
+
+    if ([1, 3, 5, 7, 9].includes(roseCount)) {
+      showRoseMessage(messages[(roseCount - 1) / 2]);
+      const voice = new Audio(voiceAudios[(roseCount - 1) / 2]);
+      voice.play();
+    }
+  }
+
+  if (isColliding(shota, ball) && roseCount < 10) {
+    soccerAudio.currentTime = 0;
+    soccerAudio.play();
+    resetItem(ball);
+  }
 }
 
 function draw() {
-  // ゲームの描画処理
-}
-
-function gameLoop() {
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
-}
-
-window.onload = () => {
-  bgm.play();
-};
-
-gameLoop();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(shotaImg, shota.x, shota.y, shota.width, shota.height);
+  ctx.draw
