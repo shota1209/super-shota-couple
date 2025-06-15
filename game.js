@@ -217,25 +217,22 @@ function updateBackground(newSrc) {
 if (roseCount === 10) {
   finalVoice.play(); // 最後のセリフを再生
   fadeTransition(() => {
-    // 画面が白くなる（白背景のオーバーレイを表示）
-    whiteOverlay.classList.add("visible");
+  // 白い背景を表示
+  whiteOverlay.classList.add("visible");
 
-    // 感謝メッセージの表示
+  setTimeout(() => {
+    thanksMessage.classList.remove("hidden");
     setTimeout(() => {
-      thanksMessage.classList.remove("hidden");
-      // さらに数秒後に未来のメッセージ表示
+      thanksMessage.classList.add("hidden");
+      futureMessage.classList.remove("hidden");
       setTimeout(() => {
-        thanksMessage.classList.add("hidden");
-        futureMessage.classList.remove("hidden");
+        futureMessage.classList.add("hidden");
+        playButton.style.display = 'block';  // ボタンを表示
+      }, 4000);  // ボタンを表示するタイミング
+    }, 4000);  // 感謝メッセージの後に未来のメッセージを表示
+  }, 4000); // 感謝メッセージが表示されるまで4秒待つ
+});
 
-        // 最後に未来のメッセージが表示された後、動画再生ボタンを表示
-        setTimeout(() => {
-          futureMessage.classList.add("hidden");
-          playButton.style.display = 'block'; // ボタンを表示
-        }, 4000); // 未来メッセージが表示された後4秒後にボタンを表示
-      }, 4000); // 感謝メッセージ表示後4秒後に未来メッセージ表示
-    }, 4000); // 白オーバーレイをフェードインした後、4秒後に感謝メッセージ表示
-  });
 }
 
 // 動画再生ボタンの処理
