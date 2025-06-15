@@ -235,7 +235,4 @@ playButton.addEventListener('click', () => {
 
 function update() {
   shota.x += shota.vx;
-  shota.y += shota.vy;
-  shota.vy += gravity;
-  if (shota.y >= canvas.height - shota.height - 60) {
-    shota.y = canvas.height - sh
+  shota
