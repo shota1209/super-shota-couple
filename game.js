@@ -275,17 +275,4 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
   ctx.drawImage(shotaImg, shota.x, shota.y, shota.width, shota.height);
-  ctx.drawImage(roseImg, rose.x, rose.y, rose.width, rose.height);
-  ctx.drawImage(ballImg, ball.x, ball.y, ball.width, ball.height);
-}
-
-function gameLoop() {
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
-}
-
-window.onload = () => {
-  bgm.play();
-};
-gameLoop();
+  ctx.draw
