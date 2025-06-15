@@ -228,4 +228,64 @@ if (roseCount === 10) {
 // 動画再生ボタンの処理
 playButton.addEventListener('click', () => {
   playButton.style.display = 'none';  // ボタンを非表示
-  video
+  videoContainer.style.display = 'block';  // 動画を表示
+  const player = new Vimeo.Player(iframe);
+  player.play();
+});
+
+function update() {
+  shota.x += shota.vx;
+  shota.y += shota.vy;
+  shota.vy += gravity;
+  if (shota.y >= canvas.height - shota.height - 60) {
+    shota.y = canvas.height - shota.height - 60;
+    shota.vy = 0;
+    shota.isJumping = false;
+  }
+  if (shota.x < 0) shota.x = 0;
+  if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
+
+  [rose, ball].forEach(item => {
+    item.y += item.speed;
+    if (item.y > canvas.height) resetItem(item);
+  });
+
+  if (isColliding(shota, rose)) {
+    roseCount++;
+    resetItem(rose);
+    createHeartEffect(shota.x, shota.y);
+    createPetal();
+    showHearts(roseCount);
+
+    if ([1, 3, 5, 7, 9].includes(roseCount)) {
+      showRoseMessage(messages[(roseCount - 1) / 2]);
+      const voice = new Audio(voiceAudios[(roseCount - 1) / 2]);
+      voice.play();
+    }
+  }
+
+  if (isColliding(shota, ball) && roseCount < 10) {
+    soccerAudio.currentTime = 0;
+    soccerAudio.play();
+    resetItem(ball);
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(shotaImg, shota.x, shota.y, shota.width, shota.height);
+  ctx.drawImage(roseImg, rose.x, rose.y, rose.width, rose.height);
+  ctx.drawImage(ballImg, ball.x, ball.y, ball.width, ball.height);
+}
+
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+window.onload = () => {
+  bgm.play();
+};
+gameLoop();
