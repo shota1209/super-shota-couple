@@ -238,31 +238,4 @@ function update() {
   shota.y += shota.vy;
   shota.vy += gravity;
   if (shota.y >= canvas.height - shota.height - 60) {
-    shota.y = canvas.height - shota.height - 60;
-    shota.vy = 0;
-    shota.isJumping = false;
-  }
-  if (shota.x < 0) shota.x = 0;
-  if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
-
-  [rose, ball].forEach(item => {
-    item.y += item.speed;
-    if (item.y > canvas.height) resetItem(item);
-  });
-
-  if (isColliding(shota, rose)) {
-    roseCount++;
-    resetItem(rose);
-    createHeartEffect(shota.x, shota.y);
-    createPetal();
-    showHearts(roseCount);
-
-    if ([1, 3, 5, 7, 9].includes(roseCount)) {
-      showRoseMessage(messages[(roseCount - 1) / 2]);
-      const voice = new Audio(voiceAudios[(roseCount - 1) / 2]);
-      voice.play();
-    }
-  }
-
-  if (isColliding(shota, ball) && roseCount < 10) {
-    soccerAudio.currentTime =
+    shota.y = canvas.height - sh
