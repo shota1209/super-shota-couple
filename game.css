@@ -44,7 +44,11 @@ body, html {
   transition: opacity 1s ease;
   pointer-events: none;
 }
-
+.petal {
+  width: 20px;  /* サイズを小さく */
+  height: 20px; /* サイズを小さく */
+  position: absolute;
+}
 #particle-container {
   position: fixed;
   width: 100%;
