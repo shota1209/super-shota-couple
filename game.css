@@ -176,3 +176,8 @@ body, html {
   opacity: 1;
   pointer-events: all;
 }
+/* スタイルをそのままで、動画が非表示の状態でスタイルを保持します */
+
+#videoContainer {
+  display: none;
+}
