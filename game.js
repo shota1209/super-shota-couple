@@ -160,22 +160,60 @@ function createHeartEffect(x, y) {
   }
 }
 
+// fadeTransitionを修正してピンク色のオーバーレイと背景遷移を実装
 function fadeTransition(callback) {
-  whiteOverlay.classList.add("visible");
+  // 既にオーバーレイが表示されている場合は何もしない
+  if (whiteOverlay.classList.contains("visible")) return;
+
+  whiteOverlay.classList.add("visible"); // ピンク色オーバーレイを表示
+
   setTimeout(() => {
-    callback();
+    callback(); // 背景の更新
+
+    // 背景更新後、1秒後にオーバーレイを非表示にする
     setTimeout(() => whiteOverlay.classList.remove("visible"), 600);
-  }, 600);
+  }, 600); // 背景更新までに遅延を設定
 }
 
+// アイテムアニメーションを停止
 function stopItemsAnimation() {
   rose.speed = 0;
   ball.speed = 0;
 }
 
+// アイテムアニメーション再開
 function resumeItemsAnimation() {
   rose.speed = 3;
   ball.speed = 3;
+}
+
+// バラを取ったときに背景が変更される
+if ([2, 4, 6, 8].includes(roseCount)) {
+  backgroundIndex++;
+  stopItemsAnimation();  // アニメーションを停止
+  fadeTransition(() => {
+    const newSrc = backgrounds[backgroundIndex];
+    bgImage.src = newSrc;
+    backgroundDiv.style.backgroundImage = `url(${newSrc})`;
+  });
+  setTimeout(resumeItemsAnimation, 1200); // アニメーションを再開
+}
+
+// 10個目のバラを取った後に白い画面を表示
+if (roseCount === 10) {
+  finalVoice.play();
+  fadeTransition(() => {
+    thanksMessage.classList.remove("hidden");
+    setTimeout(() => {
+      thanksMessage.classList.add("hidden");
+      futureMessage.classList.remove("hidden");
+      setTimeout(() => {
+        futureMessage.classList.add("hidden");
+        finalVideo.style.display = "block";
+        finalVideo.play();
+      }, 4000);
+    }, 4000);
+  });
 }
 
 function update() {
@@ -208,37 +246,8 @@ function update() {
       voice.play();
     }
 
-    if ([2, 4, 6, 8].includes(roseCount)) {
-      backgroundIndex++;
-      stopItemsAnimation();
-      fadeTransition(() => {
-        const newSrc = backgrounds[backgroundIndex];
-        bgImage.src = newSrc;
-        backgroundDiv.style.backgroundImage = `url(${newSrc})`;
-      });
-      setTimeout(resumeItemsAnimation, 1200);
-    }
-
-    if (roseCount === 9) {
-      poemDiv.innerText = "次が最後の1輪…";
-      poemDiv.style.opacity = 1;
-      setTimeout(() => poemDiv.style.opacity = 0, 3000);
-    }
-
     if (roseCount === 10) {
-      finalVoice.play();
-      fadeTransition(() => {
-        thanksMessage.classList.remove("hidden");
-        setTimeout(() => {
-          thanksMessage.classList.add("hidden");
-          futureMessage.classList.remove("hidden");
-          setTimeout(() => {
-            futureMessage.classList.add("hidden");
-            finalVideo.style.display = "block";
-            finalVideo.play();
-          }, 4000);
-        }, 4000);
-      });
+      // 最後のバラでの処理
     }
   }
 
@@ -264,6 +273,6 @@ function gameLoop() {
 }
 
 window.onload = () => {
-  bgm.play();
+  bgm.play(); // BGM自動再生
 };
 gameLoop();
