@@ -1,6 +1,3 @@
-// === 最新版 game.js ===
-// 感謝メッセージ制御、BGM・効果音・画面遷移バグ修正済み
-
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const backgroundDiv = document.getElementById("background");
@@ -194,7 +191,7 @@ function updateBackground(newSrc) {
   newImage.onload = function() {
     backgroundDiv.style.opacity = 0;
     setTimeout(() => {
-      backgroundDiv.style.backgroundImage = url(${newSrc});
+      backgroundDiv.style.backgroundImage = `url(${newSrc})`;
       backgroundDiv.style.opacity = 1;
     }, 1000);
   };
@@ -274,5 +271,4 @@ function update() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
-  ctx.drawImage(shotaImg, shota.x, shota.y, shota.width, shota.height);
-  ctx.draw
+  ctx.drawImage(shotaImg, shota.x, shota.y,
