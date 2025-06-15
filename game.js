@@ -1,11 +1,21 @@
+// === 最新版 game.js ===
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const backgroundDiv = document.getElementById("background");
+const poemDiv = document.getElementById("poem");
+const bgm = document.getElementById("bgm");
+const soccerAudio = document.getElementById("soccerAudio");
+const jumpSound = document.getElementById("jumpSound");
+const heartsContainer = document.getElementById("hearts");
+const roseMessage = document.getElementById("rose-message");
+const thanksMessage = document.getElementById("thanks-message");
+const futureMessage = document.getElementById("future-message");
+const finalVoice = document.getElementById("finalVoice");
+const whiteOverlay = document.getElementById("whiteOverlay");
+
 const playButton = document.getElementById('playButton');
 const videoContainer = document.getElementById('videoContainer');
 const iframe = document.getElementById('vimeoPlayer');
-const bgm = document.getElementById('bgm');
-const whiteOverlay = document.getElementById('whiteOverlay');
-const backgroundDiv = document.getElementById('background');
-const thanksMessage = document.getElementById('thanks-message');
-const futureMessage = document.getElementById('future-message');
 
 let bgmStarted = false;
 
@@ -16,8 +26,129 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
+const shotaImg = new Image();
+shotaImg.src = "images/shota.png";
+const roseImg = new Image();
+roseImg.src = "images/rose.png";
+const ballImg = new Image();
+ballImg.src = "images/ball.png";
+const heartIcon = "images/heart.png";
+
+const backgrounds = [
+  "images/bg1.png",
+  "images/bg2.png",
+  "images/bg3.png",
+  "images/bg4.png",
+  "images/bg5.png"
+];
+
+const messages = [
+  "付き合ってください",
+  "今度はランドも行こ〜",
+  "キャンプで寝てごめん",
+  "また海外行こ〜",
+  "次は諏訪湖の花火だね"
+];
+
+const voiceAudios = [
+  "audio/rose1.mp3",
+  "audio/rose3.mp3",
+  "audio/rose5.mp3",
+  "audio/rose7.mp3",
+  "audio/rose9.mp3"
+];
+
+let roseCount = 0;
+let backgroundIndex = 0;
+let bgImage = new Image();
+bgImage.src = backgrounds[0];
+let rose = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
+let ball = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
+resetItem(rose);
+resetItem(ball);
+
+let shota = {
+  x: canvas.width / 2,
+  y: canvas.height - 160,
+  width: 80,
+  height: 80,
+  vx: 0,
+  vy: 0,
+  isJumping: false
+};
+
+const gravity = 0.8;
+const jumpPower = -16;
+let touchStartX = 0;
+let touchStartY = 0;
+let touchInterval = null;
+
+// タッチイベント処理
+canvas.addEventListener("touchstart", e => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  const center = canvas.width / 2;
+  const direction = touchStartX < center ? -1 : 1;
+  touchInterval = setInterval(() => {
+    shota.vx = 5 * direction;
+  }, 16);
+
+  if (!bgmStarted) {
+    bgm.play();
+    bgmStarted = true;
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchmove", e => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  const dx = touch.clientX - touchStartX;
+  const dy = touchStartY - touch.clientY;
+  if (dy > 50 && !shota.isJumping) {
+    if (Math.abs(dx) > 30) {
+      shota.vx = dx > 0 ? 5 : -5;
+    }
+    shota.vy = jumpPower;
+    shota.isJumping = true;
+    jumpSound.currentTime = 0;
+    jumpSound.play();
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchend", () => {
+  clearInterval(touchInterval);
+  shota.vx = 0;
+}, { passive: false });
+
+function resetItem(item) {
+  item.x = Math.random() * (canvas.width - item.width);
+  item.y = -Math.random() * canvas.height;
+}
+
+function isColliding(a, b) {
+  return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+}
+
+function showHearts(count) {
+  heartsContainer.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const img = document.createElement("img");
+    img.src = heartIcon;
+    img.className = "heart-icon";
+    heartsContainer.appendChild(img);
+  }
+}
+
+function showRoseMessage(text) {
+  roseMessage.textContent = text;
+  roseMessage.classList.add("visible");
+  setTimeout(() => roseMessage.classList.remove("visible"), 4000);
+}
+
+// 背景変更処理
 function fadeTransition(callback) {
-  // 背景の変更時にフェードアウト
   if (whiteOverlay.classList.contains("visible")) return;
   whiteOverlay.classList.add("visible");
   setTimeout(() => {
@@ -26,20 +157,30 @@ function fadeTransition(callback) {
   }, 600);
 }
 
-// 背景画像の更新
 function updateBackground(newSrc) {
   const newImage = new Image();
   newImage.src = newSrc;
   newImage.onload = function() {
-    backgroundDiv.style.opacity = 0; // 背景をフェードアウト
+    backgroundDiv.style.opacity = 0;
     setTimeout(() => {
       backgroundDiv.style.backgroundImage = `url(${newSrc})`;
-      backgroundDiv.style.opacity = 1; // 背景をフェードイン
-    }, 1000); // 1秒後に背景更新
+      backgroundDiv.style.opacity = 1;
+    }, 1000);
   };
 }
 
-// 10個目のバラを取った後に動画再生ボタンを表示
+// バラを取った後の背景の更新
+if ([2, 4, 6, 8, 10].includes(roseCount)) {
+  backgroundIndex++;
+  stopItemsAnimation();
+  fadeTransition(() => {
+    const newSrc = backgrounds[backgroundIndex];
+    updateBackground(newSrc);
+  });
+  setTimeout(resumeItemsAnimation, 1200);
+}
+
+// 10個目のバラを取った後に動画再生ボタン表示
 if (roseCount === 10) {
   finalVoice.play();
   fadeTransition(() => {
@@ -49,18 +190,18 @@ if (roseCount === 10) {
       futureMessage.classList.remove("hidden");
       setTimeout(() => {
         futureMessage.classList.add("hidden");
-        playButton.style.display = 'block';  // 動画再生ボタンを表示
-      }, 4000);  // メッセージを隠す前に4秒待つ
-    }, 4000);  // 感謝メッセージ表示後4秒待つ
+        playButton.style.display = 'block'; // ボタン表示
+      }, 4000); // メッセージ後に4秒待つ
+    }, 4000);
   });
 }
 
-// 動画再生ボタンの処理
+// 動画再生ボタンのクリックイベント
 playButton.addEventListener('click', () => {
   playButton.style.display = 'none';  // ボタンを非表示
   videoContainer.style.display = 'block';  // 動画を表示
   const player = new Vimeo.Player(iframe);
-  player.play();  // 再生
+  player.play();  // 動画再生
 });
 
 function update() {
