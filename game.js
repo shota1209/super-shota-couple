@@ -80,6 +80,9 @@ let touchStartX = 0;
 let touchStartY = 0;
 let touchInterval = null;
 
+// タッチイベントでBGMを再生するように変更
+let bgmStarted = false;
+
 canvas.addEventListener("touchstart", e => {
   e.preventDefault();
   const touch = e.touches[0];
@@ -92,8 +95,9 @@ canvas.addEventListener("touchstart", e => {
   }, 16);
 
   // BGMを再生
-  if (!bgm.playing) {
+  if (!bgmStarted) {
     bgm.play();
+    bgmStarted = true; // BGMが再生されたフラグを立てる
   }
 }, { passive: false });
 
