@@ -200,16 +200,7 @@ function updateBackground(newSrc) {
   };
 }
 
-if ([2, 4, 6, 8, 10].includes(roseCount)) {
-  backgroundIndex++;
-  stopItemsAnimation();
-  fadeTransition(() => {
-    const newSrc = backgrounds[backgroundIndex];
-    updateBackground(newSrc);
-  });
-  setTimeout(resumeItemsAnimation, 1200);
-}
-
+// 10個目のバラを取った時の処理
 if (roseCount === 10) {
   finalVoice.play();
   fadeTransition(() => {
@@ -220,8 +211,8 @@ if (roseCount === 10) {
       setTimeout(() => {
         futureMessage.classList.add("hidden");
         playButton.style.display = 'block';  // ボタンを表示
-      }, 4000);
-    }, 4000);
+      }, 4000);  // メッセージが非表示になった後、ボタンを表示
+    }, 4000);  // 感謝メッセージ表示後4秒待つ
   });
 }
 
