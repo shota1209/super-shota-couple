@@ -212,28 +212,31 @@ function updateBackground(newSrc) {
     console.error("背景画像の読み込みに失敗しました:", newSrc);
   }
 }
-
 // 10個目のバラを取った時の処理
 if (roseCount === 10) {
   finalVoice.play(); // 最後のセリフを再生
   fadeTransition(() => {
-  // 白い背景を表示
-  whiteOverlay.classList.add("visible");
+    // 白い背景を表示
+    whiteOverlay.classList.add("visible");
 
-  setTimeout(() => {
-    thanksMessage.classList.remove("hidden");
+    // 感謝メッセージの表示
     setTimeout(() => {
-      thanksMessage.classList.add("hidden");
-      futureMessage.classList.remove("hidden");
+      thanksMessage.classList.remove("hidden");
+      // さらに数秒後に未来のメッセージ表示
       setTimeout(() => {
-        futureMessage.classList.add("hidden");
-        playButton.style.display = 'block';  // ボタンを表示
-      }, 4000);  // ボタンを表示するタイミング
-    }, 4000);  // 感謝メッセージの後に未来のメッセージを表示
-  }, 4000); // 感謝メッセージが表示されるまで4秒待つ
-});
+        thanksMessage.classList.add("hidden");
+        futureMessage.classList.remove("hidden");
 
+        // 最後に未来のメッセージが表示された後、動画再生ボタンを表示
+        setTimeout(() => {
+          futureMessage.classList.add("hidden");
+          playButton.style.display = 'block';  // ボタンを表示
+        }, 4000);  // ボタンを表示するタイミング
+      }, 4000);  // 感謝メッセージの後に未来のメッセージを表示
+    }, 4000); // 感謝メッセージが表示されるまで4秒待つ
+  });
 }
+
 
 // 動画再生ボタンの処理
 playButton.addEventListener('click', () => {
