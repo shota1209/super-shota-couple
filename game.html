@@ -9,7 +9,52 @@
 <body>
   <!-- フェード演出用白背景 -->
   <div id="whiteOverlay"></div>
+  
+  <!-- 背景 -->
+  <div id="background"></div>
 
+  <!-- 光の粒子コンテナ -->
+  <div id="particle-container"></div>
+
+  <!-- ハートUI -->
+  <div id="hearts"></div>
+
+  <!-- ポエム -->
+  <div id="poem"></div>
+
+  <!-- メッセージ表示 -->
+  <div id="rose-message"></div>
+
+  <!-- 感謝メッセージ（初期状態で非表示） -->
+  <div id="thanks-message" class="final-message hidden">今まで<br>ありがとう</div>
+  <div id="future-message" class="final-message hidden">これからも<br>よろしく</div>
+
+  <!-- メインゲームキャンバス -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- 操作説明 -->
+  <div id="instructions">
+    ←→長押しで移動 / ↑スワイプでジャンプ<br>
+    バラを3つ集めるたびに、ふたりの物語が進みます…
+  </div>
+
+  <!-- Vimeo動画（最初は非表示） -->
+  <div id="videoContainer" style="display:none;">
+    <div style="padding:177.78% 0 0 0;position:relative;">
+      <iframe id="vimeoPlayer" src="https://player.vimeo.com/video/1093447380?h=b61f35b376&badge=0&autopause=0&player_id=0&app_id=58479" frameborder="0" allow="fullscreen" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="propose"></iframe>
+    </div>
+  </div>
+
+  <!-- 音声ファイル -->
+  <audio id="bgm" src="audio/romantic.mp3" loop autoplay></audio>
+  <audio id="soccerAudio" src="audio/soccer.mp3"></audio>
+  <audio id="jumpSound" src="audio/jump.mp3"></audio>
+  <audio id="finalVoice" src="audio/shota_last.mp3"></audio>
+
+  <!-- 再生ボタン -->
+  <button id="playButton" style="display:none;">動画を再生</button>
+
+  <script src="game.js"></script>
 
 </body>
 </html>
