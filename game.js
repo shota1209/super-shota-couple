@@ -1,5 +1,4 @@
 // === 最新版 game.js ===
-// 感謝メッセージ制御、BGM・効果音・画面遷移バグ修正済み
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
