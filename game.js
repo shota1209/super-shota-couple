@@ -13,7 +13,6 @@ const roseMessage = document.getElementById("rose-message");
 const thanksMessage = document.getElementById("thanks-message");
 const futureMessage = document.getElementById("future-message");
 const finalVoice = document.getElementById("finalVoice");
-const finalVideo = document.getElementById("finalVideo");
 const whiteOverlay = document.getElementById("whiteOverlay");
 
 function resizeCanvas() {
@@ -277,5 +276,3 @@ function gameLoop() {
 
 window.onload = () => {
   bgm.play();
-};
-gameLoop();
