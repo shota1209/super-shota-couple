@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -26,9 +25,9 @@
   <!-- メッセージ表示 -->
   <div id="rose-message"></div>
 
-  <!-- 感謝メッセージ -->
-  <div id="thanks-message" class="final-message">今まで<br>ありがとう</div>
-  <div id="future-message" class="final-message">これからも<br>よろしく</div>
+  <!-- 感謝メッセージ（初期状態で非表示） -->
+  <div id="thanks-message" class="final-message hidden">今まで<br>ありがとう</div>
+  <div id="future-message" class="final-message hidden">これからも<br>よろしく</div>
 
   <!-- メインゲームキャンバス -->
   <canvas id="gameCanvas"></canvas>
@@ -43,7 +42,7 @@
   <video id="finalVideo" src="video/propose.mp4" playsinline muted></video>
 
   <!-- 音声ファイル -->
-  <audio id="bgm" src="audio/romantic.mp3" loop></audio>
+  <audio id="bgm" src="audio/romantic.mp3" loop autoplay></audio>
   <audio id="soccerAudio" src="audio/soccer.mp3"></audio>
   <audio id="jumpSound" src="audio/jump.mp3"></audio>
   <audio id="finalVoice" src="audio/shota_last.mp3"></audio>
