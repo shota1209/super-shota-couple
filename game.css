@@ -74,6 +74,19 @@ body, html {
   animation: floatParticle linear infinite;
 }
 
+#instructions {
+  position: absolute;
+  bottom: 20px; /* 下部に配置 */
+  width: 100%; /* 横幅を100%に */
+  text-align: center; /* 中央寄せ */
+  color: white; /* 文字色を白に */
+  font-size: 18px; /* フォントサイズを調整 */
+  z-index: 20; /* 他の要素の上に表示 */
+  background-color: rgba(255, 192, 203, 0.7); /* 半透明の背景色 */
+  padding: 10px; /* 少し余白を取る */
+  border-radius: 10px; /* 角を丸くする */
+}
+
 @keyframes floatParticle {
   0% { transform: translateY(0); opacity: 0.5; }
   100% { transform: translateY(100vh); opacity: 0; }
