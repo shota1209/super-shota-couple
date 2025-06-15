@@ -1,9 +1,6 @@
 
-// Corrected game.js with the following fixes:
-// - Jump sound works
-// - "Thank you" messages show only after 10 roses
-// - Fixed freeze bug after 2nd rose
-// - Pink fade transitions
+// === 最新版 game.js ===
+// 感謝メッセージ制御、BGM・効果音・画面遷移バグ修正済み
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -16,6 +13,7 @@ const heartsContainer = document.getElementById("hearts");
 const roseMessage = document.getElementById("rose-message");
 const thanksMessage = document.getElementById("thanks-message");
 const futureMessage = document.getElementById("future-message");
+const finalVoice = document.getElementById("finalVoice");
 const finalVideo = document.getElementById("finalVideo");
 const whiteOverlay = document.getElementById("whiteOverlay");
 
@@ -136,7 +134,7 @@ function showHearts(count) {
 }
 
 function showRoseMessage(text) {
-  roseMessage.innerHTML = text;
+  roseMessage.textContent = text;
   roseMessage.classList.add("visible");
   setTimeout(() => roseMessage.classList.remove("visible"), 4000);
 }
@@ -162,20 +160,12 @@ function createHeartEffect(x, y) {
   }
 }
 
-function showFinalMessages() {
-  whiteOverlay.style.opacity = 1;
+function fadeTransition(callback) {
+  whiteOverlay.classList.add("visible");
   setTimeout(() => {
-    thanksMessage.classList.add("visible");
-    setTimeout(() => {
-      thanksMessage.classList.remove("visible");
-      futureMessage.classList.add("visible");
-      setTimeout(() => {
-        futureMessage.classList.remove("visible");
-        finalVideo.style.display = "block";
-        finalVideo.play();
-      }, 3000);
-    }, 3000);
-  }, 1000);
+    callback();
+    setTimeout(() => whiteOverlay.classList.remove("visible"), 600);
+  }, 600);
 }
 
 function update() {
@@ -210,13 +200,11 @@ function update() {
 
     if ([2, 4, 6, 8].includes(roseCount)) {
       backgroundIndex++;
-      backgroundDiv.style.transition = "opacity 1s ease";
-      backgroundDiv.style.opacity = 0;
-      setTimeout(() => {
-        bgImage.src = backgrounds[backgroundIndex];
-        backgroundDiv.style.backgroundImage = `url(${bgImage.src})`;
-        backgroundDiv.style.opacity = 1;
-      }, 600);
+      fadeTransition(() => {
+        const newSrc = backgrounds[backgroundIndex];
+        bgImage.src = newSrc;
+        backgroundDiv.style.backgroundImage = `url(${newSrc})`;
+      });
     }
 
     if (roseCount === 9) {
@@ -226,19 +214,23 @@ function update() {
     }
 
     if (roseCount === 10) {
-      const finalVoice = document.getElementById("finalVoice");
       finalVoice.play();
-      for (let i = 0; i < 50; i++) setTimeout(createPetal, i * 50);
-      poemDiv.innerText = "そして──翔太が決意した瞬間へ…";
-      poemDiv.style.opacity = 1;
-      setTimeout(() => {
-        poemDiv.style.opacity = 0;
-        showFinalMessages();
-      }, 4000);
+      fadeTransition(() => {
+        thanksMessage.classList.remove("hidden");
+        setTimeout(() => {
+          thanksMessage.classList.add("hidden");
+          futureMessage.classList.remove("hidden");
+          setTimeout(() => {
+            futureMessage.classList.add("hidden");
+            finalVideo.style.display = "block";
+            finalVideo.play();
+          }, 4000);
+        }, 4000);
+      });
     }
   }
 
-  if (isColliding(shota, ball) && roseCount < 10 && poemDiv.style.opacity === "0") {
+  if (isColliding(shota, ball) && roseCount < 10) {
     soccerAudio.currentTime = 0;
     soccerAudio.play();
     resetItem(ball);
@@ -262,5 +254,4 @@ function gameLoop() {
 window.onload = () => {
   bgm.play();
 };
-
 gameLoop();
