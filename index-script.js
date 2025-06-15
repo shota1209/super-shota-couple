@@ -24,7 +24,7 @@ window.onload = () => {
   document.body.addEventListener('click', () => {
     document.body.style.opacity = 0;
     setTimeout(() => {
-      window.location.href = 'game.html';
+      window.location.href = 'story.html';
     }, 1000);
   });
 };
