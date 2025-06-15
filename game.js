@@ -168,6 +168,16 @@ function fadeTransition(callback) {
   }, 600);
 }
 
+function stopItemsAnimation() {
+  rose.speed = 0;
+  ball.speed = 0;
+}
+
+function resumeItemsAnimation() {
+  rose.speed = 3;
+  ball.speed = 3;
+}
+
 function update() {
   shota.x += shota.vx;
   shota.y += shota.vy;
@@ -200,11 +210,13 @@ function update() {
 
     if ([2, 4, 6, 8].includes(roseCount)) {
       backgroundIndex++;
+      stopItemsAnimation();
       fadeTransition(() => {
         const newSrc = backgrounds[backgroundIndex];
         bgImage.src = newSrc;
         backgroundDiv.style.backgroundImage = `url(${newSrc})`;
       });
+      setTimeout(resumeItemsAnimation, 1200);
     }
 
     if (roseCount === 9) {
