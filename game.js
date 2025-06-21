@@ -132,26 +132,6 @@ canvas.addEventListener("touchend", () => {
   shota.vx = 0;
 }, { passive: false });
 
-// アイテムごとに横位置をランダムにし、縦位置は固定で上部に配置
-function resetItem(item, otherItems = []) {
-  let newX;
-  let isOverlapping;
-
-  do {
-    // アイテムの横位置をランダムに設定
-    newX = Math.random() * (canvas.width - item.width);  // 横位置
-
-    // 他のアイテムと重ならないかチェック
-    isOverlapping = otherItems.some(otherItem => {
-      return Math.abs(newX - otherItem.x) < item.width; // アイテム同士の横幅が重なっていないか確認
-    });
-  } while (isOverlapping);  // 重なっていたら再度ランダムに
-
-  item.x = newX;  // 横位置設定
-  item.y = -Math.random() * canvas.height * 0.3;  // 縦位置は画面上部にランダムに配置
-}
-
-
 function isColliding(a, b) {
   return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
 }
@@ -266,6 +246,25 @@ playButton.addEventListener('click', () => {
   player.play();
 });
 
+// アイテムごとに横位置をランダムにし、縦位置は固定で上部に配置
+function resetItem(item, otherItems = []) {
+  let newX;
+  let isOverlapping;
+
+  do {
+    // アイテムの横位置をランダムに設定
+    newX = Math.random() * (canvas.width - item.width);  // 横位置
+
+    // 他のアイテムと重ならないかチェック
+    isOverlapping = otherItems.some(otherItem => {
+      return Math.abs(newX - otherItem.x) < item.width; // アイテム同士の横幅が重なっていないか確認
+    });
+  } while (isOverlapping);  // 重なっていたら再度ランダムに
+
+  item.x = newX;  // 横位置設定
+  item.y = -item.height;  // 縦位置は画面の上部（高さ分だけ上に配置）
+  item.speed = 2 + Math.random() * 3;  // 速度設定: 2~5の間でランダム
+}
 
 function update() {
   shota.x += shota.vx;
