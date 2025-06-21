@@ -219,7 +219,13 @@ function updateBackground(newSrc) {
       backgroundDiv.style.opacity = 1;  // フェードイン
     }, 1000); // 1秒後にフェードイン
   };
+　　　// 一度キャンバスをクリアしてから背景を切り替える
+    ctx.clearRect(0, 0, canvas.width, canvas.height);  // キャンバスをクリア
 
+    // バラやサッカーボールをリセット
+    resetItem(rose);  // バラのリセット
+    resetItem(ball);  // サッカーボールのリセット
+  
   newImage.onerror = function() {
     console.error("背景画像の読み込みに失敗しました:", newSrc);
   }
