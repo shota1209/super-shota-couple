@@ -162,7 +162,7 @@ function createPetal() {
   petal.className = "petal";
   petal.style.left = Math.random() * window.innerWidth + "px";
   document.body.appendChild(petal);
-  setTimeout(() => petal.remove(), 3000);
+  setTimeout(() => petal.remove(), 2000);
 }
 
 function createHeartEffect(x, y) {
@@ -179,7 +179,7 @@ function createHeartEffect(x, y) {
     document.body.appendChild(heart);
 
     // 3秒後に削除
-    setTimeout(() => heart.remove(), 3000);
+    setTimeout(() => heart.remove(), 2000);
   }
 }
 
