@@ -249,14 +249,6 @@ if (roseCount === 10) {
   });
 }
 
-function resetItem(item) {
-  // アイテムの位置をリセット
-  item.x = Math.random() * (canvas.width - item.width);
-  item.y = -Math.random() * canvas.height;
-}
-
-fun
-
 // 動画再生ボタンの処理
 playButton.addEventListener('click', () => {
   playButton.style.display = 'none';  // ボタンを非表示
