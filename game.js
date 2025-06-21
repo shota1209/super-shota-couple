@@ -206,6 +206,14 @@ function updateBackground(newSrc) {
   newImage.onload = function() {
     console.log("背景画像が読み込まれました:", newSrc); // ログを追加
     backgroundDiv.style.opacity = 0;  // フェードアウト
+    
+     // 一度キャンバスをクリアしてから背景を切り替える
+    ctx.clearRect(0, 0, canvas.width, canvas.height);  // キャンバスをクリア
+
+    // バラやサッカーボールをリセット
+    resetItem(rose);  // バラのリセット
+    resetItem(ball);  // サッカーボールのリセット
+
     setTimeout(() => {
       backgroundDiv.style.backgroundImage = `url(${newSrc})`;
       backgroundDiv.style.opacity = 1;  // フェードイン
@@ -241,6 +249,13 @@ if (roseCount === 10) {
   });
 }
 
+function resetItem(item) {
+  // アイテムの位置をリセット
+  item.x = Math.random() * (canvas.width - item.width);
+  item.y = -Math.random() * canvas.height;
+}
+
+fun
 
 // 動画再生ボタンの処理
 playButton.addEventListener('click', () => {
