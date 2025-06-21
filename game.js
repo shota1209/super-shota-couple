@@ -59,10 +59,14 @@ const voiceAudios = [
   "audio/rose9.mp3"
 ];
 
+// 背景画像の初期設定
+let bgImage = new Image();
+bgImage.src = backgrounds[0];  // 初期背景画像を設定
+backgroundDiv.style.backgroundImage = `url(${backgrounds[0]})`;  // 初期背景画像を設定
+backgroundDiv.style.opacity = 1; // 背景を最初から表示する
+
+
 let roseCount = 0;
-//let backgroundIndex = 0;
-//let bgImage = new Image();
-//bgImage.src = backgrounds[0];
 let rose = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
 let ball = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
 resetItem(rose);
@@ -193,9 +197,6 @@ function resumeItemsAnimation() {
   rose.speed = 3;
   ball.speed = 3;
 }
-// 初期画像設定
-backgroundDiv.style.backgroundImage = `url(${backgrounds[0]})`;  // 初期背景画像を設定
-backgroundDiv.style.opacity = 1; // 背景を最初から表示する
 
 function updateBackground(newSrc) {
   const newImage = new Image();
