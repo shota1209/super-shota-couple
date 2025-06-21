@@ -67,5 +67,5 @@ function startStoryScene() {
 
   setTimeout(() => {
     window.location.href = "game.html";
-  }, 62000);
+  }, 92000);
 }
