@@ -51,7 +51,8 @@ const messages = [
   "今度はランドも行こ〜",
   "キャンプで寝てごめん",
   "また海外行こ〜",
-  "次は諏訪湖の花火だね"
+  "次は諏訪湖の花火だね",
+  "そして今日..."
 ];
 
 const voiceAudios = [
@@ -311,6 +312,7 @@ function update() {
       
       // 白背景が表示されてから、感謝メッセージと未来メッセージを表示
       setTimeout(() => {
+        showRoseMessage(messages[5]);
         finalVoice.play(); // 最後のセリフを再生
     
         // 感謝メッセージの表示
