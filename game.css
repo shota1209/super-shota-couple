@@ -174,20 +174,22 @@
   pointer-events: all; /* 画面を操作できるようにする */
 }
 
-
 /* 動画再生ボタン */
 #playButton {
   display: block;
-  background-color: pink;
-  padding: 10px 20px;
+  background-color: rgba(255, 192, 203, 0.7);
+  padding: 20px 30px;
   border: none;
   color: white;
-  font-size: 18px;
+  font-size: 24px;
+  font-weight: bold;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 10px;
   z-index: 50;
   position: absolute;
   top: 60%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(-50%);
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
