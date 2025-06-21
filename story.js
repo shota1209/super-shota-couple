@@ -35,11 +35,11 @@ window.onload = () => {
         </div>
       `;
 
-      // 35秒後にgame.htmlへ遷移
+      // 60秒後+2秒後にgame.htmlへ遷移
       setTimeout(() => {
         window.location.href = "game.html";
-      }, 38000);
-    }, 3000);
+      }, 62000);
+    }, 1000);
   });
 };
 
