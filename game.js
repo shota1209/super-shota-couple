@@ -132,8 +132,17 @@ canvas.addEventListener("touchend", () => {
 }, { passive: false });
 
 function resetItem(item) {
-  item.x = Math.random() * (canvas.width - item.width);
-  item.y = -Math.random() * canvas.height;
+  // アイテムごとに異なる初期位置を設定
+  if (item === rose) {
+    item.x = Math.random() * (canvas.width - item.width);  // バラの位置
+    item.y = -Math.random() * canvas.height;  // バラの初期位置を画面外に設定
+  } else if (item === ball) {
+    item.x = Math.random() * (canvas.width - item.width);  // サッカーボールの位置
+    item.y = -Math.random() * canvas.height * 0.5;  // サッカーボールを画面上部に設定
+  } else if (item === garlic) {
+    item.x = Math.random() * (canvas.width - item.width);  // ニンニクの位置
+    item.y = -Math.random() * canvas.height * 0.7;  // ニンニクの初期位置を画面外に設定
+  }
 }
 
 function isColliding(a, b) {
@@ -200,9 +209,9 @@ function stopItemsAnimation() {
 }
 
 function resumeItemsAnimation() {
-  rose.speed = 3;
-  ball.speed = 3;
-  garlic.speed = 3;
+  rose.speed = 2;
+  ball.speed = 2;
+  garlic.speed = 2;
 }
 
 function updateBackground(newSrc) {
