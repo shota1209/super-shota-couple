@@ -275,7 +275,7 @@ function update() {
     showHearts(roseCount);
     
     if ([2, 4, 6, 8].includes(roseCount)) {
-      const newBackground = backgrounds[roseCount / 2 - 1]; // backgrounds[1] => bg2, backgrounds[2] => bg3 ...
+      const newBackground = backgrounds[roseCount / 2]; // backgrounds[1] => bg2, backgrounds[2] => bg3 ...
       updateBackground(newBackground);
     }
 
