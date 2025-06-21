@@ -25,8 +25,9 @@ body {
   position: absolute;
   bottom: 5vh; /* 高さの5%上に表示 */
   left: -100px;
-  width: 10vw; /* 画面幅の10%でレスポンシブ */
-  max-width: 80px; /* 最大サイズ制限 */
+  width: 80px;
+  /* width: 10vw; /* 画面幅の10%でレスポンシブ */
+  /* max-width: 80px; /* 最大サイズ制限 */
   opacity: 0;
   animation: walkRight 10s linear forwards;
   animation-delay: 3s;
@@ -37,8 +38,9 @@ body {
   position: absolute;
   bottom: 5vh;
   right: 5vw;
-  width: 10vw;
-  max-width: 80px;
+  width: 80px;
+  /* width: 10vw;
+  max-width: 80px; */
   z-index: 2;
 }
 
