@@ -132,19 +132,25 @@ canvas.addEventListener("touchend", () => {
   shota.vx = 0;
 }, { passive: false });
 
-function resetItem(item) {
-  // アイテムごとに異なる初期位置を設定
-  if (item === rose) {
-    item.x = Math.random() * (canvas.width - item.width);  // バラの位置
-    item.y = -Math.random() * canvas.height;  // バラの初期位置を画面外に設定
-  } else if (item === ball) {
-    item.x = Math.random() * (canvas.width - item.width);  // サッカーボールの位置
-    item.y = -Math.random() * canvas.height * 0.5;  // サッカーボールを画面上部に設定
-  } else if (item === garlic) {
-    item.x = Math.random() * (canvas.width - item.width);  // ニンニクの位置
-    item.y = -Math.random() * canvas.height * 0.7;  // ニンニクの初期位置を画面外に設定
-  }
+// アイテムごとに横位置をランダムにし、縦位置は固定で上部に配置
+function resetItem(item, otherItems = []) {
+  let newX;
+  let isOverlapping;
+
+  do {
+    // アイテムの横位置をランダムに設定
+    newX = Math.random() * (canvas.width - item.width);  // 横位置
+
+    // 他のアイテムと重ならないかチェック
+    isOverlapping = otherItems.some(otherItem => {
+      return Math.abs(newX - otherItem.x) < item.width; // アイテム同士の横幅が重なっていないか確認
+    });
+  } while (isOverlapping);  // 重なっていたら再度ランダムに
+
+  item.x = newX;  // 横位置設定
+  item.y = -Math.random() * canvas.height * 0.3;  // 縦位置は画面上部にランダムに配置
 }
+
 
 function isColliding(a, b) {
   return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
@@ -210,9 +216,9 @@ function stopItemsAnimation() {
 }
 
 function resumeItemsAnimation() {
-  rose.speed = 1;
-  ball.speed = 1;
-  garlic.speed = 1;
+  rose.speed = 0.8;
+  ball.speed = 0.8;
+  garlic.speed = 0.8;
 }
 
 function updateBackground(newSrc) {
@@ -227,24 +233,25 @@ function updateBackground(newSrc) {
      // 一度キャンバスをクリアしてから背景を切り替える
     ctx.clearRect(0, 0, canvas.width, canvas.height);  // キャンバスをクリア
 
+    //　アニメーションを停止
+    stopItemsAnimation();
+    
     // バラやサッカーボールをリセット
     resetItem(rose);  // バラのリセット
     resetItem(ball);  // サッカーボールのリセット
     resetItem(garlic);  // にんにくのリセット
 
+    // 背景をフェードインする処理
     setTimeout(() => {
       backgroundDiv.style.backgroundImage = `url(${newSrc})`;
       backgroundDiv.style.opacity = 1;  // フェードイン
-    }, 1000); // 1秒後にフェードイン
-  };
-　　　// 一度キャンバスをクリアしてから背景を切り替える
-    ctx.clearRect(0, 0, canvas.width, canvas.height);  // キャンバスをクリア
-
-    // バラやサッカーボールをリセット
-    resetItem(rose);  // バラのリセット
-    resetItem(ball);  // サッカーボールのリセット
-    resetItem(garlic);  // にんにくのリセット
   
+      // フェードイン後にアニメーションを再開
+      setTimeout(() => {
+        resumeItemsAnimation();  // アニメーション再開
+      }, 1000);  // 1秒後にアニメーションを再開
+    }, 1000);  // 背景の切り替えを1秒遅延させてフェードイン
+  };  
   newImage.onerror = function() {
     console.error("背景画像の読み込みに失敗しました:", newSrc);
   }
@@ -272,10 +279,16 @@ function update() {
   if (shota.x < 0) shota.x = 0;
   if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
 
-  [rose, ball,garlic].forEach(item => {
-    item.y += item.speed;
-    if (item.y > canvas.height) resetItem(item);
+  // アイテムリセット時に他のアイテムと重ならないようにする
+  [rose, ball, garlic].forEach((item, index, items) => {
+    resetItem(item, items.filter((_, i) => i !== index));  // 自分以外のアイテムと重なりをチェック
   });
+  
+  [rose, ball, garlic].forEach(item => {
+    item.y += item.speed;
+    if (item.y > canvas.height) resetItem(item, [rose, ball, garlic]);  // アイテムが画面を超えたらリセット
+  });
+
 
   if (isColliding(shota, rose)) {
     roseCount++;
