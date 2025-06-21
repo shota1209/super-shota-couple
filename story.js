@@ -14,32 +14,32 @@ const storyLines = [
 
 window.onload = () => {
   const overlay = document.getElementById("start-overlay");
+
   overlay.addEventListener("click", () => {
     overlay.style.display = "none";
 
-    setTimeout(() => {
-      if (!bgmStarted) {
-        bgm.play().catch(() => {});
-        bgmStarted = true;
-      }
+    // BGM再生（即スタート）
+    if (!bgmStarted) {
+      bgm.play().catch(() => {});
+      bgmStarted = true;
+    }
 
-      const container = document.querySelector(".story-container");
-      container.innerHTML = `
-        <img src="images/romantic_bg.png" class="background" alt="背景">
-        <img src="images/shota.png" class="shota" alt="Shota">
-        <img src="images/kaoru.png" class="kaoru" alt="Kaoru">
-        <div id="story-text" class="story-text">
-          <div class="scrolling-text">
-            ${storyLines.join("\n")}
-          </div>
+    // 背景・キャラ・テキストを即表示
+    const container = document.querySelector(".story-container");
+    container.innerHTML = `
+      <img src="images/romantic_bg.png" class="background" alt="背景">
+      <img src="images/shota.png" class="shota" alt="Shota">
+      <img src="images/kaoru.png" class="kaoru" alt="Kaoru">
+      <div id="story-text" class="story-text">
+        <div class="scrolling-text">
+          ${storyLines.join("\n")}
         </div>
-      `;
+      </div>
+    `;
 
-      // 60秒後+2秒後にgame.htmlへ遷移
-      setTimeout(() => {
-        window.location.href = "game.html";
-      }, 62000);
-    }, 1000);
+    // 60秒 + バッファ2秒後に game.html へ遷移
+    setTimeout(() => {
+      window.location.href = "game.html";
+    }, 62000);
   });
 };
-
