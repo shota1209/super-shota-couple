@@ -287,6 +287,10 @@ function update() {
       // キャンバスを一時的に非表示にする
       canvas.style.display = 'none';  // キャンバスを隠す
     
+      // 操作説明とハートUIを非表示にする
+      document.getElementById('instructions').style.display = 'none';  // 操作説明を非表示
+      heartsContainer.style.display = 'none';  // ハートUIを非表示
+      
       // 白背景が表示されてから、感謝メッセージと未来メッセージを表示
       setTimeout(() => {
         finalVoice.play(); // 最後のセリフを再生
@@ -309,12 +313,8 @@ function update() {
           }, 4000);  // 感謝メッセージの後に未来のメッセージを表示
         }, 4000); // 感謝メッセージが表示されるまで4秒待つ
       }, 1000); // 白背景の表示後1秒待つ
-    
-      // 再度キャンバスを表示したい場合
-      setTimeout(() => {
-        canvas.style.display = 'block';  // キャンバスを再表示
-      }, 10000);  // 10秒後にキャンバスを再表示
     }
+
 
   }
 
