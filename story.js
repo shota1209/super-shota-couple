@@ -35,12 +35,11 @@ window.onload = () => {
 
   overlay.addEventListener("click", () => {
     overlay.style.display = "none";
-
-    // すぐに開始（3秒待たず）
-    startStoryScene();
+    startStoryScene(); // ← ちゃんと呼び出し
   });
 };
 
+// 🔧 忘れてはいけない！ストーリー開始関数
 function startStoryScene() {
   if (!bgmStarted) {
     bgm.play().catch(() => {});
@@ -54,14 +53,12 @@ function startStoryScene() {
     <img src="images/kaoru.png" class="kaoru" alt="Kaoru">
     <div id="story-text" class="story-text">
       <div class="scrolling-text">
-        ${storyLines.join("\n")}
+        ${storyLines.map(line => line === "" ? "<br>" : line + "<br>").join("")}
       </div>
     </div>
   `;
 
-  // 60秒 + バッファ2秒後に game.html へ遷移
   setTimeout(() => {
     window.location.href = "game.html";
   }, 62000);
 }
-
