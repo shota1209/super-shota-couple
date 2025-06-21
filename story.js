@@ -15,43 +15,31 @@ const storyLines = [
 window.onload = () => {
   const overlay = document.getElementById("start-overlay");
   overlay.addEventListener("click", () => {
-    overlay.style.display = "none"; // タップで白画面を消す
+    overlay.style.display = "none";
 
     setTimeout(() => {
-      // BGM 再生
       if (!bgmStarted) {
         bgm.play().catch(() => {});
         bgmStarted = true;
       }
 
-      // 背景とキャラを表示
       const container = document.querySelector(".story-container");
       container.innerHTML = `
-        <img src="images/romantic_bg.png" class="background" alt="背景">
+        <img src="images/romantic-pastel-bg.png" class="background" alt="背景">
         <img src="images/shota.png" class="shota" alt="Shota">
         <img src="images/kaoru.png" class="kaoru" alt="Kaoru">
-        <div id="story-text" class="story-text"></div>
+        <div id="story-text" class="story-text">
+          <div class="scrolling-text">
+            ${storyLines.join("\n")}
+          </div>
+        </div>
       `;
 
-      const storyText = document.getElementById("story-text");
-      let index = 0;
-
-      function showNextLine() {
-        if (index < storyLines.length) {
-          const p = document.createElement("p");
-          p.textContent = storyLines[index];
-          p.classList.add("fade-in");
-          storyText.appendChild(p);
-          index++;
-          setTimeout(showNextLine, 3500);
-        } else {
-          setTimeout(() => {
-            window.location.href = "game.html";
-          }, 3000);
-        }
-      }
-
-      showNextLine();
-    }, 1000); // 1秒後に開始
+      // 35秒後にgame.htmlへ遷移
+      setTimeout(() => {
+        window.location.href = "game.html";
+      }, 38000);
+    }, 3000);
   });
 };
+
