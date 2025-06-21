@@ -270,6 +270,11 @@ function update() {
     createHeartEffect(shota.x, shota.y);
     createPetal();
     showHearts(roseCount);
+    
+    if ([2, 4, 6, 8].includes(roseCount)) {
+      const newBackground = backgrounds[roseCount / 2 - 1]; // backgrounds[1] => bg2, backgrounds[2] => bg3 ...
+      updateBackground(newBackground);
+    }
 
     if ([1, 3, 5, 7, 9].includes(roseCount)) {
       showRoseMessage(messages[(roseCount - 1) / 2]);
