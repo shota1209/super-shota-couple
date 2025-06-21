@@ -247,24 +247,12 @@ playButton.addEventListener('click', () => {
 });
 
 // アイテムごとに横位置をランダムにし、縦位置は固定で上部に配置
-function resetItem(item, otherItems = []) {
-  let newX;
-  let isOverlapping;
-
-  do {
-    // アイテムの横位置をランダムに設定
-    newX = Math.random() * (canvas.width - item.width);  // 横位置
-
-    // 他のアイテムと重ならないかチェック
-    isOverlapping = otherItems.some(otherItem => {
-      return Math.abs(newX - otherItem.x) < item.width; // アイテム同士の横幅が重なっていないか確認
-    });
-  } while (isOverlapping);  // 重なっていたら再度ランダムに
-
-  item.x = newX;  // 横位置設定
-  item.y = -item.height;  // 縦位置は画面の上部（高さ分だけ上に配置）
-  item.speed = 2 + Math.random() * 3;  // 速度設定: 2~5の間でランダム
+function resetItem(item) {
+  item.x = Math.random() * (canvas.width - item.width);
+  item.y = -Math.random() * canvas.height;
 }
+
+let isAudioPlaying = false;  // 音声再生中かどうかのフラグ
 
 function update() {
   shota.x += shota.vx;
@@ -279,17 +267,13 @@ function update() {
   if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
 
   // アイテムリセット時に他のアイテムと重ならないようにする
-  [rose, ball, garlic].forEach((item, index, items) => {
-    resetItem(item, items.filter((_, i) => i !== index));  // 自分以外のアイテムと重なりをチェック
-  });
-  
-  [rose, ball, garlic].forEach(item => {
+  [rose, ball,garlic].forEach(item => {
     item.y += item.speed;
-    if (item.y > canvas.height) resetItem(item, [rose, ball, garlic]);  // アイテムが画面を超えたらリセット
+    if (item.y > canvas.height) resetItem(item);
   });
 
-
-  if (isColliding(shota, rose)) {
+  // バラを取った時の処理
+  if (isColliding(shota, rose) && !isAudioPlaying) {
     roseCount++;
     resetItem(rose);
     createHeartEffect(shota.x, shota.y);
@@ -305,6 +289,14 @@ function update() {
       showRoseMessage(messages[(roseCount - 1) / 2]);
       const voice = new Audio(voiceAudios[(roseCount - 1) / 2]);
       voice.play();
+      isAudioPlaying = true;  // 音声再生中フラグを立てる
+
+      // 音声再生終了時にフラグをリセット
+      voice.onended = () => {
+        isAudioPlaying = false;
+      };
+    }
+
     }
     // 10個目のバラを取った時の処理
     if ([10].includes(roseCount)) {
@@ -350,17 +342,29 @@ function update() {
 
   }
 
-  if (isColliding(shota, ball) && roseCount < 10) {
+  // ボールを取った時の処理
+  if (isColliding(shota, ball) && roseCount < 10 && !isAudioPlaying) {
     soccerAudio.currentTime = 0;
     soccerAudio.play();
+    isAudioPlaying = true;  // 音声再生中フラグを立てる
     resetItem(ball);
+
+    soccerAudio.onended = () => {
+      isAudioPlaying = false;
+    };
   }
-  if (isColliding(shota, garlic) && roseCount < 10) {
+
+  // ガーリックを取った時の処理
+  if (isColliding(shota, garlic) && roseCount < 10 && !isAudioPlaying) {
     garlicAudio.currentTime = 0;
     garlicAudio.play();
+    isAudioPlaying = true;  // 音声再生中フラグを立てる
     resetItem(garlic);
+
+    garlicAudio.onended = () => {
+      isAudioPlaying = false;
+    };
   }
-  
 }
 
 function draw() {
