@@ -1,3 +1,6 @@
+const bgm = document.getElementById("bgm");
+let bgmStarted = false;
+
 const storyLines = [
   "翔太とかおるは2023年、運命的に出会いました。",
   "奇跡的に誕生日も一緒だった2人は、自然と惹かれ合い、お付き合いを始めました。",
@@ -10,33 +13,45 @@ const storyLines = [
 ];
 
 window.onload = () => {
-  const container = document.querySelector(".story-container");
+  const overlay = document.getElementById("start-overlay");
+  overlay.addEventListener("click", () => {
+    overlay.style.display = "none"; // タップで白画面を消す
 
-  // 背景画像・Shota・Kaoru・テキストボックスを追加
-  container.innerHTML = `
-    <img src="images/romantic-pastel-bg.png" class="background" alt="背景">
-    <img src="images/shota.png" class="shota" alt="Shota">
-    <img src="images/kaoru.png" class="kaoru" alt="Kaoru">
-    <div id="story-text" class="story-text"></div>
-  `;
+    setTimeout(() => {
+      // BGM 再生
+      if (!bgmStarted) {
+        bgm.play().catch(() => {});
+        bgmStarted = true;
+      }
 
-  const storyText = document.getElementById("story-text");
-  let index = 0;
+      // 背景とキャラを表示
+      const container = document.querySelector(".story-container");
+      container.innerHTML = `
+        <img src="images/romantic-pastel-bg.png" class="background" alt="背景">
+        <img src="images/shota.png" class="shota" alt="Shota">
+        <img src="images/kaoru.png" class="kaoru" alt="Kaoru">
+        <div id="story-text" class="story-text"></div>
+      `;
 
-  function showNextLine() {
-    if (index < storyLines.length) {
-      const p = document.createElement("p");
-      p.textContent = storyLines[index];
-      p.classList.add("fade-in");
-      storyText.appendChild(p);
-      index++;
-      setTimeout(showNextLine, 3500);
-    } else {
-      setTimeout(() => {
-        window.location.href = "game.html";
-      }, 3000);
-    }
-  }
+      const storyText = document.getElementById("story-text");
+      let index = 0;
 
-  showNextLine();
+      function showNextLine() {
+        if (index < storyLines.length) {
+          const p = document.createElement("p");
+          p.textContent = storyLines[index];
+          p.classList.add("fade-in");
+          storyText.appendChild(p);
+          index++;
+          setTimeout(showNextLine, 3500);
+        } else {
+          setTimeout(() => {
+            window.location.href = "game.html";
+          }, 3000);
+        }
+      }
+
+      showNextLine();
+    }, 3000); // 3秒後に開始
+  });
 };
