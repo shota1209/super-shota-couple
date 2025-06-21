@@ -6,6 +6,7 @@ const backgroundDiv = document.getElementById("background");
 const poemDiv = document.getElementById("poem");
 const bgm = document.getElementById("bgm");
 const soccerAudio = document.getElementById("soccerAudio");
+const soccerAudio = document.getElementById("garlicAudio");
 const jumpSound = document.getElementById("jumpSound");
 const heartsContainer = document.getElementById("hearts");
 const roseMessage = document.getElementById("rose-message");
@@ -33,6 +34,8 @@ const roseImg = new Image();
 roseImg.src = "images/rose.png";
 const ballImg = new Image();
 ballImg.src = "images/ball.png";
+const garlicImg = new Image();
+garlicImg.src = "images/garlic.png";
 const heartIcon = "images/heart.png";
 
 const backgrounds = [
@@ -69,8 +72,10 @@ backgroundDiv.style.opacity = 1; // 背景を最初から表示する
 let roseCount = 0;
 let rose = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
 let ball = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
+let garlic = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
 resetItem(rose);
 resetItem(ball);
+resetItem(garlic);
 
 let shota = {
   x: canvas.width / 2,
@@ -191,11 +196,13 @@ function fadeTransition(callback) {
 function stopItemsAnimation() {
   rose.speed = 0;
   ball.speed = 0;
+  garlic.speed = 0;
 }
 
 function resumeItemsAnimation() {
   rose.speed = 3;
   ball.speed = 3;
+  garlic.speed = 3;
 }
 
 function updateBackground(newSrc) {
@@ -213,6 +220,7 @@ function updateBackground(newSrc) {
     // バラやサッカーボールをリセット
     resetItem(rose);  // バラのリセット
     resetItem(ball);  // サッカーボールのリセット
+    resetItem(garlic);  // にんにくのリセット
 
     setTimeout(() => {
       backgroundDiv.style.backgroundImage = `url(${newSrc})`;
@@ -225,6 +233,7 @@ function updateBackground(newSrc) {
     // バラやサッカーボールをリセット
     resetItem(rose);  // バラのリセット
     resetItem(ball);  // サッカーボールのリセット
+    resetItem(garlic);  // にんにくのリセット
   
   newImage.onerror = function() {
     console.error("背景画像の読み込みに失敗しました:", newSrc);
@@ -323,14 +332,20 @@ function update() {
     soccerAudio.play();
     resetItem(ball);
   }
+  if (isColliding(shota, garlic) && roseCount < 10) {
+    garlicAudio.currentTime = 0;
+    garlicAudio.play();
+    resetItem(garlic);
+  }
+  
 }
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  //ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
   ctx.drawImage(shotaImg, shota.x, shota.y, shota.width, shota.height);
   ctx.drawImage(roseImg, rose.x, rose.y, rose.width, rose.height);
   ctx.drawImage(ballImg, ball.x, ball.y, ball.width, ball.height);
+  ctx.drawImage(garlicImg, garlic.x, garlic.y, garlic.width, garlic.height);
 }
 
 function gameLoop() {
