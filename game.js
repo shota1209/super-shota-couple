@@ -262,7 +262,7 @@ function update() {
   if (shota.x < 0) shota.x = 0;
   if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
 
-  [rose, ball].forEach(item => {
+  [rose, ball,garlic].forEach(item => {
     item.y += item.speed;
     if (item.y > canvas.height) resetItem(item);
   });
