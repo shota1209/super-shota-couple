@@ -27,7 +27,7 @@ window.onload = () => {
       // 背景とキャラを表示
       const container = document.querySelector(".story-container");
       container.innerHTML = `
-        <img src="images/romanticbg.png" class="background" alt="背景">
+        <img src="images/romantic_bg.png" class="background" alt="背景">
         <img src="images/shota.png" class="shota" alt="Shota">
         <img src="images/kaoru.png" class="kaoru" alt="Kaoru">
         <div id="story-text" class="story-text"></div>
