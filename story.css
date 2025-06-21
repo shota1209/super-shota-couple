@@ -78,9 +78,9 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 80vw;
-  height: 60vh;
+  height: 50vh;
   overflow: hidden;
-  background: rgba(255, 240, 250, 0.7);
+  background: rgba(255, 240, 250, 0.8);
   padding: 1em;
   border-radius: 12px;
   z-index: 3;
