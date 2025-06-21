@@ -340,8 +340,6 @@ function update() {
     }
 
 
-  }
-
   // ボールを取った時の処理
   if (isColliding(shota, ball) && roseCount < 10 && !isAudioPlaying) {
     soccerAudio.currentTime = 0;
