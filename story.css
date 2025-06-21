@@ -24,7 +24,7 @@ body {
 .shota {
   position: absolute;
   bottom: 15vh; /* 高さの5%上に表示 */
-  left: -100px;
+  left: 0px;
   width: 80px;
   /* width: 10vw; /* 画面幅の10%でレスポンシブ */
   /* max-width: 80px; /* 最大サイズ制限 */
