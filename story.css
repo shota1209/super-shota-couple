@@ -23,20 +23,19 @@ body {
 
 .shota {
   position: absolute;
-  bottom: 5vh; /* 高さの5%上に表示 */
+  bottom: 15vh; /* 高さの5%上に表示 */
   left: -100px;
   width: 80px;
   /* width: 10vw; /* 画面幅の10%でレスポンシブ */
   /* max-width: 80px; /* 最大サイズ制限 */
   opacity: 0;
-  animation: walkRight 10s linear forwards;
-  animation-delay: 3s;
+  animation: walkRight 60s linear forwards;
   z-index: 2;
 }
 
 .kaoru {
   position: absolute;
-  bottom: 5vh;
+  bottom: 15vh;
   right: 5vw;
   width: 80px;
   /* width: 10vw;
