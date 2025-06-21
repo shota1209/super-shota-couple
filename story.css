@@ -29,7 +29,7 @@ body {
   /* width: 10vw; /* 画面幅の10%でレスポンシブ */
   /* max-width: 80px; /* 最大サイズ制限 */
   opacity: 0;
-  animation: walkRight 60s linear forwards;
+  animation: walkRight 80s linear forwards;
   z-index: 2;
 }
 
@@ -100,13 +100,13 @@ body {
 .scrolling-text {
   animation: scrollUp 90s linear forwards;
   display: inline-block;
-  line-height: 2.0em;
+  line-height: 2.2em;
   white-space: pre-line;
 }
 
 @keyframes scrollUp {
   0% {
-    transform: translateY(35%);
+    transform: translateY(30%);
   }
   100% {
     transform: translateY(-100%);
