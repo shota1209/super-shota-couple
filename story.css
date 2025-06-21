@@ -24,7 +24,6 @@ body {
 .shota {
   position: absolute;
   bottom: 15vh; /* 高さの5%上に表示 */
-  left: 0px;
   width: 80px;
   /* width: 10vw; /* 画面幅の10%でレスポンシブ */
   /* max-width: 80px; /* 最大サイズ制限 */
@@ -54,7 +53,7 @@ body {
 }
 
 @keyframes walkRight {
-  0% { left: -100px; opacity: 1; }
+  0% { left: 0px; opacity: 1; }
   100% { left: 60%; opacity: 1; }
 }
 #start-overlay {
