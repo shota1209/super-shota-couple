@@ -196,9 +196,9 @@ function stopItemsAnimation() {
 }
 
 function resumeItemsAnimation() {
-  rose.speed = 2;
-  ball.speed = 2;
-  garlic.speed = 2;
+  rose.speed = 3;
+  ball.speed = 3;
+  garlic.speed = 3;
 }
 
 function updateBackground(newSrc) {
