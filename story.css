@@ -74,11 +74,12 @@ body {
 
 .story-text {
   position: absolute;
-  bottom: 20vh;
+  top:10vh;
+  /* bottom: 20vh; */
   left: 50%;
   transform: translateX(-50%);
   width: 80vw;
-  height: 40vh;
+  height: 60vh;
   overflow: hidden;
   background: rgba(255, 240, 250, 0.7);
   padding: 1em;
@@ -98,9 +99,9 @@ body {
 }
 
 .scrolling-text {
-  animation: scrollUp 35s linear forwards;
+  animation: scrollUp 60s linear forwards;
   display: inline-block;
-  line-height: 1.8em;
+  line-height: 2.0em;
   white-space: pre-line;
 }
 
