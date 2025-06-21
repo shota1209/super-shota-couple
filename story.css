@@ -86,7 +86,7 @@ body {
   z-index: 3;
   text-align: center;
   color: #d6336c;
-  font-size: 2.2em;
+  font-size: 1.8em;
 
   /* グラデーションマスク（フェードアウト効果） */
   -webkit-mask-image: linear-gradient(to top, transparent 0%, black 30%, black 70%, transparent 100%);
