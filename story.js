@@ -18,28 +18,32 @@ window.onload = () => {
   overlay.addEventListener("click", () => {
     overlay.style.display = "none";
 
-    // BGM再生（即スタート）
-    if (!bgmStarted) {
-      bgm.play().catch(() => {});
-      bgmStarted = true;
-    }
-
-    // 背景・キャラ・テキストを即表示
-    const container = document.querySelector(".story-container");
-    container.innerHTML = `
-      <img src="images/romantic_bg.png" class="background" alt="背景">
-      <img src="images/shota.png" class="shota" alt="Shota">
-      <img src="images/kaoru.png" class="kaoru" alt="Kaoru">
-      <div id="story-text" class="story-text">
-        <div class="scrolling-text">
-          ${storyLines.join("\n")}
-        </div>
-      </div>
-    `;
-
-    // 60秒 + バッファ2秒後に game.html へ遷移
-    setTimeout(() => {
-      window.location.href = "game.html";
-    }, 62000);
+    // すぐに開始（3秒待たず）
+    startStoryScene();
   });
 };
+
+function startStoryScene() {
+  if (!bgmStarted) {
+    bgm.play().catch(() => {});
+    bgmStarted = true;
+  }
+
+  const container = document.querySelector(".story-container");
+  container.innerHTML = `
+    <img src="images/romantic_bg.png" class="background" alt="背景">
+    <img src="images/shota.png" class="shota" alt="Shota">
+    <img src="images/kaoru.png" class="kaoru" alt="Kaoru">
+    <div id="story-text" class="story-text">
+      <div class="scrolling-text">
+        ${storyLines.join("\n")}
+      </div>
+    </div>
+  `;
+
+  // 60秒 + バッファ2秒後に game.html へ遷移
+  setTimeout(() => {
+    window.location.href = "game.html";
+  }, 62000);
+}
+
