@@ -276,7 +276,6 @@ function update() {
       voice.play();
     }
     // 10個目のバラを取った時の処理
-    // 10個目のバラを取った時の処理
     if ([10].includes(roseCount)) {
       // バラとサッカーボールのアニメーションをストップ
       stopItemsAnimation();  // バラとサッカーボールのアニメーションを止める
@@ -284,6 +283,9 @@ function update() {
       // 背景を真っ白にフェードアウト
       whiteOverlay.classList.add("visible");  // 白い背景を表示
       backgroundDiv.style.opacity = 0;  // 背景をフェードアウト
+      
+      // キャンバスを一時的に非表示にする
+      canvas.style.display = 'none';  // キャンバスを隠す
     
       // 白背景が表示されてから、感謝メッセージと未来メッセージを表示
       setTimeout(() => {
@@ -307,7 +309,13 @@ function update() {
           }, 4000);  // 感謝メッセージの後に未来のメッセージを表示
         }, 4000); // 感謝メッセージが表示されるまで4秒待つ
       }, 1000); // 白背景の表示後1秒待つ
+    
+      // 再度キャンバスを表示したい場合
+      setTimeout(() => {
+        canvas.style.display = 'block';  // キャンバスを再表示
+      }, 10000);  // 10秒後にキャンバスを再表示
     }
+
   }
 
   if (isColliding(shota, ball) && roseCount < 10) {
