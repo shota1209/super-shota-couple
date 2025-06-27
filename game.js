@@ -142,6 +142,8 @@ function showHearts(count) {
     const img = document.createElement("img");
     img.src = heartIcon;
     img.className = "heart-icon";
+    img.style.width = '30px';
+    img.style.height = '30px';
     heartsContainer.appendChild(img);
   }
 }
