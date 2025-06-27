@@ -242,7 +242,7 @@ function updateBackground(newSrc) {
 
 // 動画再生ボタンの処理
 playButton.addEventListener('click', () => {
-  playButton.style.display = 'none';  // ボタンを非表示
+  playButton.style.display = 'block';  // ボタンを非表示
   videoContainer.style.display = 'block';  // 動画を表示
   const player = new Vimeo.Player(iframe);
   player.play();
