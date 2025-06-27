@@ -49,7 +49,7 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  width: auto;  /* 幅を固定 */
+  width: 100%;  /* 幅を固定 */
   height: 100px; /* 高さを固定 */
   display: flex;
   flex-wrap: wrap;
