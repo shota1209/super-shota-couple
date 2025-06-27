@@ -349,6 +349,7 @@ function update() {
   // ボールを取った時の処理
   if (isColliding(shota, ball) && roseCount < 10 && !isAudioPlaying) {
     soccerAudio.currentTime = 0;
+    soccerAudio.volume = 1;
     soccerAudio.play();
     isAudioPlaying = true;  // 音声再生中フラグを立てる
     resetItem(ball);
