@@ -244,6 +244,7 @@ playButton.addEventListener('click', () => {
   videoContainer.style.display = 'block';  // 動画を表示
   const player = new Vimeo.Player(iframe);
   player.play();
+  playButton.style.display = 'none';  // ボタンを非表示
 });
 
 // アイテムごとに横位置をランダムにし、縦位置は固定で上部に配置
