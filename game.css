@@ -44,6 +44,20 @@
   position: absolute;
 }
 
+/* ハートUI */
+#hearts {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 100px;  /* 幅を固定 */
+  height: 100px; /* 高さを固定 */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
 .heart-icon {
   width: 30px; /* 小さいサイズ */
   height: 30px;
