@@ -295,6 +295,12 @@ function update() {
       voice.onended = () => {
         isAudioPlaying = false;
       };
+      // 音声が長い場合にタイムアウトでリセット
+      setTimeout(() => {
+        if (isAudioPlaying) {
+          isAudioPlaying = false;  // 強制的にフラグをリセット
+        }
+      }, 7000);     
     }
 
     }
@@ -350,6 +356,13 @@ function update() {
     soccerAudio.onended = () => {
       isAudioPlaying = false;
     };
+    // 音声が長い場合にタイムアウトでリセット
+    setTimeout(() => {
+      if (isAudioPlaying) {
+        isAudioPlaying = false;  // 強制的にフラグをリセット
+      }
+    }, 4000);  
+    
   }
 
   // ガーリックを取った時の処理
@@ -362,6 +375,12 @@ function update() {
     garlicAudio.onended = () => {
       isAudioPlaying = false;
     };
+    // 音声が長い場合にタイムアウトでリセット
+    setTimeout(() => {
+      if (isAudioPlaying) {
+        isAudioPlaying = false;  // 強制的にフラグをリセット
+      }
+    }, 4000);  
   }
 }
 
