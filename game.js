@@ -179,6 +179,18 @@ function createHeartEffect(x, y) {
   }
 }
 
+// 動画再生ボタンの処理
+playButton.addEventListener('click', () => {
+  videoContainer.style.display = 'block';  // 動画表示
+
+  const player = new Vimeo.Player(iframe);
+  player.play().then(() => {
+    playButton.style.display = 'none';  // 再生成功後に非表示
+  }).catch((error) => {
+    console.error('再生エラー:', error);
+  });
+});
+
 
 function fadeTransition(callback) {
   if (whiteOverlay.classList.contains("visible")) return;
@@ -236,16 +248,6 @@ function updateBackground(newSrc) {
     console.error("背景画像の読み込みに失敗しました:", newSrc);
   }
 }
-
-
-// 動画再生ボタンの処理
-playButton.addEventListener('click', () => {
-  playButton.style.display = 'block';  // ボタンを非表示
-  videoContainer.style.display = 'block';  // 動画を表示
-  const player = new Vimeo.Player(iframe);
-  player.play();
-  playButton.style.display = 'none';  // ボタンを非表示
-});
 
 // アイテムごとに横位置をランダムにし、縦位置は固定で上部に配置
 function resetItem(item) {
