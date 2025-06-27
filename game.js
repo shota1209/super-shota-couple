@@ -253,6 +253,7 @@ function resetItem(item) {
 }
 
 let isAudioPlaying = false;  // 音声再生中かどうかのフラグ
+let isFinalVoicePlaying = false
 
 function update() {
   shota.x += shota.vx;
@@ -305,7 +306,6 @@ function update() {
 
     }
     // 10個目のバラを取った時の処理
-    let isFinalVoicePlaying = false
     if ([10].includes(roseCount)) {
       // バラとサッカーボールのアニメーションをストップ
       stopItemsAnimation();  // バラとサッカーボールのアニメーションを止める
@@ -322,35 +322,33 @@ function update() {
       heartsContainer.style.display = 'none';  // ハートUIを非表示
       
       // 白背景が表示されてから、感謝メッセージと未来メッセージを表示
+      // 白背景が表示されてから、感謝メッセージと未来メッセージを表示
       setTimeout(() => {
-        if (!isFinalVoicePlaying){
+        if (!isFinalVoicePlaying) {
           showRoseMessage(messages[5]);
           finalVoice.play(); // 最後のセリフを再生
-          isFinalVoicePlaying = true
+          isFinalVoicePlaying = true;  // 最後のセリフが再生中フラグを立てる
         }
-        
+  
         // 感謝メッセージの表示
         setTimeout(() => {
           // display: blockにして感謝メッセージを表示
           thanksMessage.style.display = 'block';
-          
+  
           // さらに数秒後に未来のメッセージ表示
           setTimeout(() => {
             thanksMessage.style.display = 'none';  // 感謝メッセージを非表示
             futureMessage.style.display = 'block'; // 未来のメッセージを表示
-    
+  
             // 最後に未来のメッセージが表示された後、動画再生ボタンを表示
             setTimeout(() => {
               futureMessage.style.display = 'none'; // 未来メッセージを非表示
               playButton.style.display = 'block';  // ボタンを表示
             }, 4000);  // ボタンを表示するタイミング
           }, 4000);  // 感謝メッセージの後に未来のメッセージを表示
-        }, 7000); // 感謝メッセージが表示されるまで7秒待つ
+        }, 5000); // 感謝メッセージが表示されるまで5秒待つ
       }, 1000); // 白背景の表示後1秒待つ
     }
-    finalVoice.onended = () => {
-      isAudioPlaying = false;
-    };
 
   // ボールを取った時の処理
   if (isColliding(shota, ball) && roseCount < 10 && !isAudioPlaying) {
@@ -390,6 +388,10 @@ function update() {
     }, 4000);  
   }
 }
+
+finalVoice.onended = () => {
+  isAudioPlaying = false;
+};
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
