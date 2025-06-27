@@ -305,6 +305,7 @@ function update() {
 
     }
     // 10個目のバラを取った時の処理
+    let isFinalVoicePlaying = false
     if ([10].includes(roseCount)) {
       // バラとサッカーボールのアニメーションをストップ
       stopItemsAnimation();  // バラとサッカーボールのアニメーションを止める
@@ -322,9 +323,12 @@ function update() {
       
       // 白背景が表示されてから、感謝メッセージと未来メッセージを表示
       setTimeout(() => {
-        showRoseMessage(messages[5]);
-        finalVoice.play(); // 最後のセリフを再生
-    
+        if (!isFinalVoicePlaying){
+          showRoseMessage(messages[5]);
+          finalVoice.play(); // 最後のセリフを再生
+          isFinalVoicePlaying = true
+        }
+        
         // 感謝メッセージの表示
         setTimeout(() => {
           // display: blockにして感謝メッセージを表示
