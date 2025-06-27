@@ -348,7 +348,9 @@ function update() {
         }, 7000); // 感謝メッセージが表示されるまで7秒待つ
       }, 1000); // 白背景の表示後1秒待つ
     }
-
+    finalVoice.onended = () => {
+      isAudioPlaying = false;
+    };
 
   // ボールを取った時の処理
   if (isColliding(shota, ball) && roseCount < 10 && !isAudioPlaying) {
