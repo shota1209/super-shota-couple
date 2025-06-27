@@ -49,13 +49,14 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  width: 100px;  /* 幅を固定 */
+  width: auto;  /* 幅を固定 */
   height: 100px; /* 高さを固定 */
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   pointer-events: none;
+  gap: 5px;
 }
 
 .heart-icon {
