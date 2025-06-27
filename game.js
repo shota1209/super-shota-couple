@@ -346,7 +346,8 @@ function update() {
             // 最後に未来のメッセージが表示された後、動画再生ボタンを表示
             setTimeout(() => {
               futureMessage.style.display = 'none'; // 未来メッセージを非表示
-              playButton.style.display = 'block';  // ボタンを表示
+              vimeoPlayer = new Vimeo.Player(iframe);
+              //playButton.style.display = 'block';  // ボタンを表示
             }, 4000);  // ボタンを表示するタイミング
           }, 4000);  // 感謝メッセージの後に未来のメッセージを表示
         }, 5000); // 感謝メッセージが表示されるまで5秒待つ
