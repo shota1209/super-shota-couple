@@ -28,7 +28,7 @@ body {
   /* width: 10vw; /* 画面幅の10%でレスポンシブ */
   /* max-width: 80px; /* 最大サイズ制限 */
   opacity: 0;
-  animation: walkRight 80s linear forwards;
+  animation: walkRight 60s linear forwards;
   z-index: 2;
 }
 
