@@ -97,7 +97,7 @@ body {
 }
 
 .scrolling-text {
-  animation: scrollUp 59s linear forwards;
+  animation: scrollUp 60s linear forwards;
   display: inline-block;
   line-height: 2.2em;
   white-space: pre-line;
