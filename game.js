@@ -15,6 +15,19 @@ const futureMessage = document.getElementById("future-message");
 const finalVoice = document.getElementById("finalVoice");
 const whiteOverlay = document.getElementById("whiteOverlay");
 
+//バージョンアップ(ケーキと車)
+// ケーキ用の音声配列
+const cakeAudios = [
+  document.getElementById("cake_kaoru"),
+  document.getElementById("cake_shota1"),
+  document.getElementById("cake_shota2")
+];
+// ケーキ用の音声配列
+const carAudios = [
+  document.getElementById("car_kaoru"),
+  document.getElementById("car_shota")
+];
+
 const playButton = document.getElementById('playButton');
 const videoContainer = document.getElementById('videoContainer');
 const iframe = document.getElementById('vimeoPlayer');
@@ -37,6 +50,11 @@ ballImg.src = "images/ball.png";
 const garlicImg = new Image();
 garlicImg.src = "images/garlic.png";
 const heartIcon = "images/heart.png";
+//バージョンアップ
+const carImg = new Image();
+carImg.src = "images/car.png";
+const cakeImg = new Image();
+cakeImg.src = "images/cake.png";
 
 const backgrounds = [
   "images/bg1.png",
@@ -74,9 +92,13 @@ let roseCount = 0;
 let rose = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
 let ball = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
 let garlic = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
+let car = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
+let cake = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
 resetItem(rose);
 resetItem(ball);
 resetItem(garlic);
+resetItem(cake);
+resetItem(car);
 
 let shota = {
   x: canvas.width / 2,
@@ -205,12 +227,16 @@ function stopItemsAnimation() {
   rose.speed = 0;
   ball.speed = 0;
   garlic.speed = 0;
+  car.speed = 0;
+  cake.speed = 0;
 }
 
 function resumeItemsAnimation() {
   rose.speed = 3;
   ball.speed = 3;
   garlic.speed = 3;
+  car.speed = 3;
+  cake.speed = 3;
 }
 
 function updateBackground(newSrc) {
@@ -232,6 +258,8 @@ function updateBackground(newSrc) {
     resetItem(rose);  // バラのリセット
     resetItem(ball);  // サッカーボールのリセット
     resetItem(garlic);  // にんにくのリセット
+    resetItem(car);  // 車のリセット
+    resetItem(cake);  // ケーキのリセット
 
     // 背景をフェードインする処理
     setTimeout(() => {
@@ -271,7 +299,7 @@ function update() {
   if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
 
   // アイテムリセット時に他のアイテムと重ならないようにする
-  [rose, ball,garlic].forEach(item => {
+  [rose, ball,garlic,car,cake].forEach(item => {
     item.y += item.speed;
     if (item.y > canvas.height) resetItem(item);
   });
@@ -392,6 +420,53 @@ function update() {
       }
     }, 4000);  
   }
+
+  // ケーキを取った時の処理
+  if (isColliding(shota, cake) && roseCount < 10 && !isAudioPlaying) {
+    // ランダムに1つ選ぶ
+    const randomAudio = cakeAudios[Math.floor(Math.random() * cakeAudios.length)];
+
+    randomAudio.currentTime = 0;
+    randomAudio.play();
+    isAudioPlaying = true;
+
+    resetItem(cake);
+
+    randomAudio.onended = () => {
+      isAudioPlaying = false;
+    };
+
+    // 音声が長すぎた場合に保険でフラグをリセット
+    setTimeout(() => {
+      if (isAudioPlaying) {
+        isAudioPlaying = false;
+      }
+    }, 4000);
+  }
+
+  // 車を取った時の処理
+  if (isColliding(shota, car) && roseCount < 10 && !isAudioPlaying) {
+    // ランダムに1つ選ぶ
+    const randomAudio = carAudios[Math.floor(Math.random() * carAudios.length)];
+
+    randomAudio.currentTime = 0;
+    randomAudio.play();
+    isAudioPlaying = true;
+
+    resetItem(car);
+
+    randomAudio.onended = () => {
+      isAudioPlaying = false;
+    };
+
+    // 音声が長すぎた場合に保険でフラグをリセット
+    setTimeout(() => {
+      if (isAudioPlaying) {
+        isAudioPlaying = false;
+      }
+    }, 4000);
+  }
+
 }
 
 finalVoice.onended = () => {
@@ -404,6 +479,8 @@ function draw() {
   ctx.drawImage(roseImg, rose.x, rose.y, rose.width, rose.height);
   ctx.drawImage(ballImg, ball.x, ball.y, ball.width, ball.height);
   ctx.drawImage(garlicImg, garlic.x, garlic.y, garlic.width, garlic.height);
+  ctx.drawImage(carImg, car.x, car.y, car.width, car.height);
+  ctx.drawImage(cakeImg, cake.x, cake.y, cake.width, cake.height);
 }
 
 function gameLoop() {
