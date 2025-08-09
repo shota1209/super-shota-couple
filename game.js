@@ -88,7 +88,7 @@ backgroundDiv.style.backgroundImage = `url(${backgrounds[0]})`;  // 初期背景
 backgroundDiv.style.opacity = 1; // 背景を最初から表示する
 
 
-const FALL_SPEED = 2; // ← 好きな値に。2.0 や 1.0 でもOK
+const FALL_SPEED = 2.3; // ← 好きな値に。2.0 や 1.0 でもOK
 let roseCount = 0;
 let rose = { x: 0, y: 0, width: 40, height: 40, speed: FALL_SPEED };
 let ball = { x: 0, y: 0, width: 40, height: 40, speed: FALL_SPEED };
@@ -495,3 +495,4 @@ window.onload = () => {
 };
 
 gameLoop();
+
