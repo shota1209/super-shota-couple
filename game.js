@@ -88,12 +88,13 @@ backgroundDiv.style.backgroundImage = `url(${backgrounds[0]})`;  // 初期背景
 backgroundDiv.style.opacity = 1; // 背景を最初から表示する
 
 
+const FALL_SPEED = 2; // ← 好きな値に。2.0 や 1.0 でもOK
 let roseCount = 0;
-let rose = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
-let ball = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
-let garlic = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
-let car = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
-let cake = { x: 0, y: 0, width: 40, height: 40, speed: 3 };
+let rose = { x: 0, y: 0, width: 40, height: 40, speed: FALL_SPEED };
+let ball = { x: 0, y: 0, width: 40, height: 40, speed: FALL_SPEED };
+let garlic = { x: 0, y: 0, width: 40, height: 40, speed: FALL_SPEED };
+let car = { x: 0, y: 0, width: 40, height: 40, speed: FALL_SPEED };
+let cake = { x: 0, y: 0, width: 40, height: 40, speed: FALL_SPEED };
 resetItem(rose);
 resetItem(ball);
 resetItem(garlic);
@@ -232,11 +233,11 @@ function stopItemsAnimation() {
 }
 
 function resumeItemsAnimation() {
-  rose.speed = 3;
-  ball.speed = 3;
-  garlic.speed = 3;
-  car.speed = 3;
-  cake.speed = 3;
+  rose.speed = FALL_SPEED;
+  ball.speed = FALL_SPEED;
+  garlic.speed = FALL_SPEED;
+  car.speed = FALL_SPEED;
+  cake.speed = FALL_SPEED;
 }
 
 function updateBackground(newSrc) {
@@ -332,7 +333,7 @@ function update() {
         if (isAudioPlaying) {
           isAudioPlaying = false;  // 強制的にフラグをリセット
         }
-      }, 4000);     
+      }, 5000);     
     }
 
     }
@@ -399,7 +400,7 @@ function update() {
       if (isAudioPlaying) {
         isAudioPlaying = false;  // 強制的にフラグをリセット
       }
-    }, 4000);  
+    }, 5000);  
     
   }
 
@@ -418,7 +419,7 @@ function update() {
       if (isAudioPlaying) {
         isAudioPlaying = false;  // 強制的にフラグをリセット
       }
-    }, 4000);  
+    }, 5000);  
   }
 
   // ケーキを取った時の処理
@@ -441,7 +442,7 @@ function update() {
       if (isAudioPlaying) {
         isAudioPlaying = false;
       }
-    }, 4000);
+    }, 5000);
   }
 
   // 車を取った時の処理
@@ -464,7 +465,7 @@ function update() {
       if (isAudioPlaying) {
         isAudioPlaying = false;
       }
-    }, 4000);
+    }, 5000);
   }
 
 }
