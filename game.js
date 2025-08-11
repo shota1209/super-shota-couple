@@ -8,6 +8,7 @@ const bgm = document.getElementById("bgm");
 const soccerAudio = document.getElementById("soccerAudio");
 const garlicAudio = document.getElementById("garlicAudio");
 const jumpSound = document.getElementById("jumpSound");
+const soccerHappyAudio = document.getElementById("soccer_happy_audio");
 const heartsContainer = document.getElementById("hearts");
 const roseMessage = document.getElementById("rose-message");
 const thanksMessage = document.getElementById("thanks-message");
@@ -15,6 +16,16 @@ const futureMessage = document.getElementById("future-message");
 const finalVoice = document.getElementById("finalVoice");
 const whiteOverlay = document.getElementById("whiteOverlay");
 let vimeoPlayer = null;
+
+
+// 痩せた演出用（非等倍スケール）
+let shotaScaleX = 1;
+let shotaScaleY = 1;
+let shotaSlimActive = false;
+
+// サッカー嬉しさ演出（小さいボールの紙吹雪）
+let fxBalls = []; // {x,y,vx,vy,life,rot,alpha}
+let fxTexts = []; // {x,y,vy,alpha,text,life}
 
 
 //バージョンアップ(ケーキと車)
@@ -292,6 +303,96 @@ function applyShotaSize(state) {
   shota.height = newH;
 }
 
+// 痩せた演出：横にキュッ、縦にスッ（0.6秒）
+function playSlimEffect(duration = 600) {
+  if (shotaSlimActive) return;
+  shotaSlimActive = true;
+  const start = performance.now();
+  (function anim(now) {
+    const t = Math.min((now - start) / duration, 1);
+    // いったん 0.85x, 1.15y へ細長く → 戻る（easeOut）
+    const ease = t * (2 - t);
+    const s = Math.sin(ease * Math.PI);
+    shotaScaleX = 1 - 0.15 * s;
+    shotaScaleY = 1 + 0.15 * s;
+
+    if (t < 1) requestAnimationFrame(anim);
+    else {
+      shotaScaleX = 1;
+      shotaScaleY = 1;
+      shotaSlimActive = false;
+    }
+  })(start);
+}
+
+// 小ボール紙吹雪＆テキスト
+function spawnSoccerConfetti(cx, cy, count = 12) {
+  for (let i = 0; i < count; i++) {
+    const ang = (Math.PI * 2 * i) / count + Math.random() * 0.6;
+    const spd = 2 + Math.random() * 2.5;
+    fxBalls.push({
+      x: cx, y: cy,
+      vx: Math.cos(ang) * spd,
+      vy: Math.sin(ang) * spd - 1.5, // 少し上向き
+      rot: Math.random() * Math.PI * 2,
+      life: 900, // ms
+      alpha: 1
+    });
+  }
+  fxTexts.push({
+    x: cx, y: cy - 20, vy: -0.6,
+    text: "サッカー行けて嬉しい〜!", alpha: 1, life: 1000
+  });
+}
+
+// 全アイテム音声を止める（除外対象は止めない）
+function stopAllItemAudios(exclude = null) {
+  const audios = [
+    soccerAudio, garlicAudio,
+    ...cakeAudios, ...carAudios
+  ];
+  audios.forEach(a => {
+    if (a !== exclude) {
+      try {
+        a.pause();
+        a.currentTime = 0;
+      } catch {}
+    }
+  });
+  isAudioPlaying = false;
+}
+
+// 通常アイテムを画面から一旦退避＆停止
+function hideRegularItems() {
+  stopItemsAnimation();
+  [rose, ball, garlic, car, cake].forEach(item => { item.y = -9999; });
+}
+
+// 通常アイテムを復帰
+function showRegularItems() {
+  [rose, ball, garlic, car, cake].forEach(resetItem);
+  resumeItemsAnimation();
+}
+
+// 2秒後に光るボール投入するシーケンス
+function startForcedSoccerSequence() {
+  hideRegularItems();
+  setTimeout(() => {
+    if (!specialBallActive) triggerForcedSoccer(); // 多重防止
+  }, 2000);
+}
+
+// 光るボールを捕まえたかどうか？
+function endSpecialBall(caught) {
+  specialBallActive = false;
+  resetItem(ball);
+  ball.speed = FALL_SPEED;
+  showRegularItems();
+  // デバッグログ
+  // console.log(caught ? "glow ball caught" : "glow ball timeout");
+}
+
+
 // direction: "up" or "down"
 function animateShotaSize(direction, duration = 500) {
   if (shotaSizeAnimating) return;
@@ -405,21 +506,28 @@ function update() {
   if (specialBallActive) {
     ball.y += FALL_SPEED * 1.8; // 演出用の落下
     if (isColliding(shota, ball)) {
-      if (shotaSize === "large") setShotaState("medium", "down");
-      specialBallActive = false;
-      resetItem(ball);
-      ball.speed = FALL_SPEED; // ← 通常速度に戻す
+      // 1) ボイス
+      soccerHappyAudio.currentTime = 0;
+      soccerHappyAudio.play().catch(()=>{});
+      // 2) 一気に small へ（演出は "down" と痩せエフェクト）
+      if (shotaSize === "large") {
+        shotaSize = "small";         // 状態だけ先に確定
+        applyShotaSize("small");     // 画像・サイズを即反映（足元基準補正）
+        animateShotaSize("down");    // 下方向の“ふわっ”
+        playSlimEffect();            // 3) 痩せ演出
+      }
+      // 4) うれしさ演出（紙吹雪＋テキスト）
+      spawnSoccerConfetti(shota.x + shota.width / 2, shota.y);
+      
+      endSpecialBall(true);  // ← 下の関数で終了一括処理
     }
     if (performance.now() - specialBallStart > 7000) {
-      specialBallActive = false;
-      resetItem(ball);
-      ball.speed = FALL_SPEED;   // ← これも戻す
+      endSpecialBall(false); // ← タイムアウト終了
     }
   }
 
-
   // バラを取った時の処理
-  if (isColliding(shota, rose) && !isAudioPlaying) {
+  if (!specialBallActive && isColliding(shota, rose) && !isAudioPlaying) {
     roseCount++;
     resetItem(rose);
     createHeartEffect(shota.x, shota.y);
@@ -498,7 +606,7 @@ function update() {
     }
 
   // ガーリックを取った時の処理
-  if (isColliding(shota, garlic) && roseCount < 10 && !isAudioPlaying) {
+  if (!specialBallActive && isColliding(shota, garlic) && roseCount < 10 && !isAudioPlaying) {
     garlicAudio.currentTime = 0;
     garlicAudio.play();
     isAudioPlaying = true;  // 音声再生中フラグを立てる
@@ -516,7 +624,7 @@ function update() {
   }
 
   // ボールを取った時の処理
-  if (isColliding(shota, ball) && roseCount < 10 && !isAudioPlaying) {
+  if (!specialBallActive && isColliding(shota, ball) && roseCount < 10 && !isAudioPlaying) {
     soccerAudio.currentTime = 0;
     soccerAudio.volume = 1;
     soccerAudio.play();
@@ -542,50 +650,41 @@ function update() {
   }
 
   // ケーキを取った時の処理
-  if (isColliding(shota, cake) && roseCount < 10 && !isAudioPlaying) {
+  // ケーキを取った時の処理
+  if (!specialBallActive && isColliding(shota, cake) && roseCount < 10 && !isAudioPlaying) {
     if (shotaSize === "large") {
       const specialAudio = document.getElementById("cake_large_audio");
+      stopAllItemAudios(specialAudio);   // ← これだけは止めない
       specialAudio.currentTime = 0;
       specialAudio.play();
       isAudioPlaying = true;
-
       specialAudio.onended = () => { isAudioPlaying = false; };
 
-      // ★ここで強制サッカー発動
-      if (!specialBallActive) {          // 多重発火防止
-        triggerForcedSoccer();
-      }
-      resetItem(cake);                   // Large時もケーキは消す
-    } 
-    else {
-      // ランダムに1つ選ぶ
-      const randomAudio = cakeAudios[Math.floor(Math.random() * cakeAudios.length)];
+      if (!specialBallActive) startForcedSoccerSequence(); // ← 2秒後に光るボール
+      resetItem(cake);
 
+    } else {
+      const randomAudio = cakeAudios[Math.floor(Math.random() * cakeAudios.length)];
+      stopAllItemAudios(randomAudio);    // 他は止める
       randomAudio.currentTime = 0;
       randomAudio.play();
       isAudioPlaying = true;
+      randomAudio.onended = () => { isAudioPlaying = false; };
 
-      resetItem(cake);
-
-      randomAudio.onended = () => {
-        isAudioPlaying = false;
-      };
-    
-      // ケーキ：small→medium→large（largeは変化なし）
+      // サイズUP
       if (shotaSize === "small")       setShotaState("medium", "up");
       else if (shotaSize === "medium") setShotaState("large",  "up");
+
+      resetItem(cake);
     }
 
-    // 音声が長すぎた場合に保険でフラグをリセット
-    setTimeout(() => {
-      if (isAudioPlaying) {
-        isAudioPlaying = false;
-      }
-    }, 5000);
+    // 保険の解除
+    setTimeout(() => { if (isAudioPlaying) isAudioPlaying = false; }, 5000);
   }
 
+
   // 車を取った時の処理
-  if (isColliding(shota, car) && roseCount < 10 && !isAudioPlaying) {
+  if (!specialBallActive && isColliding(shota, car) && roseCount < 10 && !isAudioPlaying) {
     // ランダムに1つ選ぶ
     const randomAudio = carAudios[Math.floor(Math.random() * carAudios.length)];
 
@@ -619,8 +718,47 @@ function draw() {
   // ★ Shota：拡大縮小＆上下バウンド対応描画
   ctx.save();
   ctx.translate(shota.x + shota.width / 2, shota.y + shota.height / 2 + shotaBobOffsetY);
-  ctx.scale(shotaAnimScale, shotaAnimScale);
+  // 先の“ピョコン”用の等倍スケール × 痩せ演出の非等倍スケールを合成
+  ctx.scale(shotaAnimScale * shotaScaleX, shotaAnimScale * shotaScaleY);
   ctx.drawImage(shotaImg, -shota.width / 2, -shota.height / 2, shota.width, shota.height);
+  ctx.restore();
+
+  // ★紙吹雪ボール
+  for (let i = fxBalls.length - 1; i >= 0; i--) {
+    const p = fxBalls[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.04;       // ほんの少し重力
+    p.rot += 0.1;
+    p.life -= 16;
+    p.alpha = Math.max(0, p.life / 900);
+
+    ctx.save();
+    ctx.globalAlpha = p.alpha;
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    const s = 0.35; // 小さく描く
+    ctx.drawImage(ballImg, -ball.width * s / 2, -ball.height * s / 2, ball.width * s, ball.height * s);
+    ctx.restore();
+
+    if (p.life <= 0) fxBalls.splice(i, 1);
+  }
+
+  // ★テキスト
+  ctx.save();
+  ctx.font = "bold 24px 'Arial'";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  for (let i = fxTexts.length - 1; i >= 0; i--) {
+    const t = fxTexts[i];
+    t.y += t.vy;
+    t.life -= 16;
+    t.alpha = Math.max(0, t.life / 1000);
+    ctx.globalAlpha = t.alpha;
+    ctx.fillStyle = "rgba(255, 215, 0, 1)"; // ゴールド
+    ctx.fillText(t.text, t.x, t.y);
+    if (t.life <= 0) fxTexts.splice(i, 1);
+  }
   ctx.restore();
 
   ctx.drawImage(ballImg,   ball.x,   ball.y,   ball.width,   ball.height);
