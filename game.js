@@ -14,6 +14,8 @@ const thanksMessage = document.getElementById("thanks-message");
 const futureMessage = document.getElementById("future-message");
 const finalVoice = document.getElementById("finalVoice");
 const whiteOverlay = document.getElementById("whiteOverlay");
+let vimeoPlayer = null;
+
 
 //バージョンアップ(ケーキと車)
 // ケーキ用の音声配列
@@ -58,9 +60,10 @@ let shotaAnimScale = 1.0;   // 一時的な拡大/縮小（最終的に1.0へ戻
 let shotaBobOffsetY = 0;    // 一時的な上下ゆらし
 let shotaSizeAnimating = false;
 
+// ★強制サッカー演出用
+let specialBallActive = false;
+let specialBallStart = 0;
 
-//const shotaImg = new Image();
-//shotaImg.src = "images/shota.png";
 const roseImg = new Image();
 roseImg.src = "images/rose.png";
 const ballImg = new Image();
@@ -260,6 +263,14 @@ function resumeItemsAnimation() {
   cake.speed = FALL_SPEED;
 }
 
+function triggerForcedSoccer() {
+  ball.x = Math.random() * (canvas.width - ball.width);
+  ball.y = -ball.height;
+  ball.speed = 0;              // ← 通常落下は停止（上の特別ロジックで動かす）
+  specialBallActive = true;
+  specialBallStart = performance.now();
+}
+
 //　shotaの画像を変化させる
 function applyShotaSize(state) {
   // 画像切替
@@ -378,10 +389,34 @@ function update() {
   if (shota.x > canvas.width - shota.width) shota.x = canvas.width - shota.width;
 
   // アイテムリセット時に他のアイテムと重ならないようにする
-  [rose, ball,garlic,car,cake].forEach(item => {
+  // 通常アイテム
+  [rose, garlic, car, cake].forEach(item => {
     item.y += item.speed;
     if (item.y > canvas.height) resetItem(item);
   });
+
+  // ★サッカーボール：通常時は通常落下、特別時は別制御
+  if (!specialBallActive) {
+    ball.y += ball.speed;
+    if (ball.y > canvas.height) resetItem(ball);
+  }
+
+  // ★強制サッカー演出中
+  if (specialBallActive) {
+    ball.y += FALL_SPEED * 1.8; // 演出用の落下
+    if (isColliding(shota, ball)) {
+      if (shotaSize === "large") setShotaState("medium", "down");
+      specialBallActive = false;
+      resetItem(ball);
+      ball.speed = FALL_SPEED; // ← 通常速度に戻す
+    }
+    if (performance.now() - specialBallStart > 7000) {
+      specialBallActive = false;
+      resetItem(ball);
+      ball.speed = FALL_SPEED;   // ← これも戻す
+    }
+  }
+
 
   // バラを取った時の処理
   if (isColliding(shota, rose) && !isAudioPlaying) {
@@ -508,22 +543,38 @@ function update() {
 
   // ケーキを取った時の処理
   if (isColliding(shota, cake) && roseCount < 10 && !isAudioPlaying) {
-    // ランダムに1つ選ぶ
-    const randomAudio = cakeAudios[Math.floor(Math.random() * cakeAudios.length)];
+    if (shotaSize === "large") {
+      const specialAudio = document.getElementById("cake_large_audio");
+      specialAudio.currentTime = 0;
+      specialAudio.play();
+      isAudioPlaying = true;
 
-    randomAudio.currentTime = 0;
-    randomAudio.play();
-    isAudioPlaying = true;
+      specialAudio.onended = () => { isAudioPlaying = false; };
 
-    resetItem(cake);
+      // ★ここで強制サッカー発動
+      if (!specialBallActive) {          // 多重発火防止
+        triggerForcedSoccer();
+      }
+      resetItem(cake);                   // Large時もケーキは消す
+    } 
+    else {
+      // ランダムに1つ選ぶ
+      const randomAudio = cakeAudios[Math.floor(Math.random() * cakeAudios.length)];
 
-    randomAudio.onended = () => {
-      isAudioPlaying = false;
-    };
+      randomAudio.currentTime = 0;
+      randomAudio.play();
+      isAudioPlaying = true;
 
-    // ケーキ：small→medium→large（largeは変化なし）
-    if (shotaSize === "small")      setShotaState("medium", "up");
-    else if (shotaSize === "medium") setShotaState("large",  "up");
+      resetItem(cake);
+
+      randomAudio.onended = () => {
+        isAudioPlaying = false;
+      };
+    
+      // ケーキ：small→medium→large（largeは変化なし）
+      if (shotaSize === "small")       setShotaState("medium", "up");
+      else if (shotaSize === "medium") setShotaState("large",  "up");
+    }
 
     // 音声が長すぎた場合に保険でフラグをリセット
     setTimeout(() => {
@@ -572,9 +623,30 @@ function draw() {
   ctx.drawImage(shotaImg, -shota.width / 2, -shota.height / 2, shota.width, shota.height);
   ctx.restore();
 
+  ctx.drawImage(ballImg,   ball.x,   ball.y,   ball.width,   ball.height);
+  
+  // ★特別ボールのハイライト
+  if (specialBallActive) {
+    const t = (performance.now() - specialBallStart) / 1000;
+    const cx = ball.x + ball.width / 2;
+    const cy = ball.y + ball.height / 2;
+    const r  = Math.max(ball.width, ball.height) * 0.9 + 6 * Math.sin(t * 6);
+
+    ctx.save();
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = "rgba(255, 215, 0, 0.9)"; // ゴールドっぽい
+    ctx.shadowColor = "rgba(255, 215, 0, 0.9)";
+    ctx.shadowBlur = 18;
+    ctx.globalAlpha = 0.7 + 0.3 * Math.sin(t * 6);
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   // そのほかのアイテムは従来通り
   ctx.drawImage(roseImg,   rose.x,   rose.y,   rose.width,   rose.height);
-  ctx.drawImage(ballImg,   ball.x,   ball.y,   ball.width,   ball.height);
   ctx.drawImage(garlicImg, garlic.x, garlic.y, garlic.width, garlic.height);
   ctx.drawImage(carImg,    car.x,    car.y,    car.width,    car.height);
   ctx.drawImage(cakeImg,   cake.x,   cake.y,   cake.width,   cake.height);
