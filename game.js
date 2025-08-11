@@ -41,8 +41,26 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-const shotaImg = new Image();
-shotaImg.src = "images/shota.png";
+// もともとの shotaImg 定義を置き換え
+const shotaSmallImg  = new Image(); shotaSmallImg.src  = "images/shota.png";
+const shotaMediumImg = new Image(); shotaMediumImg.src = "images/shota_medium.png";
+const shotaLargeImg  = new Image(); shotaLargeImg.src  = "images/shota_large.png";
+
+// 今表示中の画像ポインタ
+let shotaImg = shotaSmallImg;
+
+const BASE_SHOTA_SIZE = 80;
+let shotaSize = "small"; // "small" | "medium" | "large"
+const SIZE_MUL = { small: 1.0, medium: 1.2, large: 1.4 };
+
+// バウンス演出用
+let shotaAnimScale = 1.0;   // 一時的な拡大/縮小（最終的に1.0へ戻る）
+let shotaBobOffsetY = 0;    // 一時的な上下ゆらし
+let shotaSizeAnimating = false;
+
+
+//const shotaImg = new Image();
+//shotaImg.src = "images/shota.png";
 const roseImg = new Image();
 roseImg.src = "images/rose.png";
 const ballImg = new Image();
@@ -110,6 +128,8 @@ let shota = {
   vy: 0,
   isJumping: false
 };
+
+applyShotaSize(shotaSize); // ← ここで初期状態を確定（足元基準の補正も入る）
 
 const gravity = 0.8;
 const jumpPower = -16;
@@ -239,6 +259,64 @@ function resumeItemsAnimation() {
   car.speed = FALL_SPEED;
   cake.speed = FALL_SPEED;
 }
+
+//　shotaの画像を変化させる
+function applyShotaSize(state) {
+  // 画像切替
+  if (state === "small") shotaImg = shotaSmallImg;
+  if (state === "medium") shotaImg = shotaMediumImg;
+  if (state === "large") shotaImg = shotaLargeImg;
+
+  // 幅・高さを段階に合わせて変更（足元基準で位置補正）
+  const oldW = shota.width, oldH = shota.height;
+  const mul = SIZE_MUL[state];
+  const newW = BASE_SHOTA_SIZE * mul;
+  const newH = BASE_SHOTA_SIZE * mul;
+
+  // 中心と足元を極力維持
+  shota.x += (oldW - newW) / 2; // 横はセンター維持
+  shota.y += (oldH - newH);     // 縦は足元維持（yは上基準なので差分を足す）
+
+  shota.width  = newW;
+  shota.height = newH;
+}
+
+// direction: "up" or "down"
+function animateShotaSize(direction, duration = 500) {
+  if (shotaSizeAnimating) return;
+  shotaSizeAnimating = true;
+
+  const start = performance.now();
+  const bob = direction === "up" ? -14 : 14; // 上にふわっ/下にふわっ
+  const amp = 0.15; // 拡大/縮小の強さ
+
+  (function anim(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = t * (2 - t); // easeOutQuad
+    const s = Math.sin(ease * Math.PI);
+
+    // up: 一瞬大きく → 戻る / down: 一瞬小さく → 戻る
+    shotaAnimScale = direction === "up" ? 1 + amp * s : 1 - amp * s;
+    shotaBobOffsetY = bob * s;
+
+    if (t < 1) {
+      requestAnimationFrame(anim);
+    } else {
+      shotaAnimScale = 1.0;
+      shotaBobOffsetY = 0;
+      shotaSizeAnimating = false;
+    }
+  })(start);
+}
+
+// 状態遷移 + 演出
+function setShotaState(toState, direction) {
+  if (shotaSize === toState) return;  // 変化なしならスキップ
+  shotaSize = toState;
+  applyShotaSize(toState);
+  animateShotaSize(direction);
+}
+
 
 function updateBackground(newSrc) {
   const newImage = new Image();
@@ -384,26 +462,6 @@ function update() {
       }, 1000); // 白背景の表示後1秒待つ
     }
 
-  // ボールを取った時の処理
-  if (isColliding(shota, ball) && roseCount < 10 && !isAudioPlaying) {
-    soccerAudio.currentTime = 0;
-    soccerAudio.volume = 1;
-    soccerAudio.play();
-    isAudioPlaying = true;  // 音声再生中フラグを立てる
-    resetItem(ball);
-
-    soccerAudio.onended = () => {
-      isAudioPlaying = false;
-    };
-    // 音声が長い場合にタイムアウトでリセット
-    setTimeout(() => {
-      if (isAudioPlaying) {
-        isAudioPlaying = false;  // 強制的にフラグをリセット
-      }
-    }, 5000);  
-    
-  }
-
   // ガーリックを取った時の処理
   if (isColliding(shota, garlic) && roseCount < 10 && !isAudioPlaying) {
     garlicAudio.currentTime = 0;
@@ -422,6 +480,32 @@ function update() {
     }, 5000);  
   }
 
+  // ボールを取った時の処理
+  if (isColliding(shota, ball) && roseCount < 10 && !isAudioPlaying) {
+    soccerAudio.currentTime = 0;
+    soccerAudio.volume = 1;
+    soccerAudio.play();
+    isAudioPlaying = true;  // 音声再生中フラグを立てる
+    resetItem(ball);
+
+    soccerAudio.onended = () => {
+      isAudioPlaying = false;
+    };
+
+    // shotaサイズを変更する
+    // ★サイズDOWN：large→medium→small（smallは変化なし）
+    if (shotaSize === "large")       setShotaState("medium", "down");
+    else if (shotaSize === "medium") setShotaState("small",  "down");
+
+    // 音声が長い場合にタイムアウトでリセット
+    setTimeout(() => {
+      if (isAudioPlaying) {
+        isAudioPlaying = false;  // 強制的にフラグをリセット
+      }
+    }, 5000);  
+    
+  }
+
   // ケーキを取った時の処理
   if (isColliding(shota, cake) && roseCount < 10 && !isAudioPlaying) {
     // ランダムに1つ選ぶ
@@ -436,6 +520,10 @@ function update() {
     randomAudio.onended = () => {
       isAudioPlaying = false;
     };
+
+    // ケーキ：small→medium→large（largeは変化なし）
+    if (shotaSize === "small")      setShotaState("medium", "up");
+    else if (shotaSize === "medium") setShotaState("large",  "up");
 
     // 音声が長すぎた場合に保険でフラグをリセット
     setTimeout(() => {
@@ -476,13 +564,22 @@ finalVoice.onended = () => {
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(shotaImg, shota.x, shota.y, shota.width, shota.height);
-  ctx.drawImage(roseImg, rose.x, rose.y, rose.width, rose.height);
-  ctx.drawImage(ballImg, ball.x, ball.y, ball.width, ball.height);
+
+  // ★ Shota：拡大縮小＆上下バウンド対応描画
+  ctx.save();
+  ctx.translate(shota.x + shota.width / 2, shota.y + shota.height / 2 + shotaBobOffsetY);
+  ctx.scale(shotaAnimScale, shotaAnimScale);
+  ctx.drawImage(shotaImg, -shota.width / 2, -shota.height / 2, shota.width, shota.height);
+  ctx.restore();
+
+  // そのほかのアイテムは従来通り
+  ctx.drawImage(roseImg,   rose.x,   rose.y,   rose.width,   rose.height);
+  ctx.drawImage(ballImg,   ball.x,   ball.y,   ball.width,   ball.height);
   ctx.drawImage(garlicImg, garlic.x, garlic.y, garlic.width, garlic.height);
-  ctx.drawImage(carImg, car.x, car.y, car.width, car.height);
-  ctx.drawImage(cakeImg, cake.x, cake.y, cake.width, cake.height);
+  ctx.drawImage(carImg,    car.x,    car.y,    car.width,    car.height);
+  ctx.drawImage(cakeImg,   cake.x,   cake.y,   cake.width,   cake.height);
 }
+
 
 function gameLoop() {
   update();
@@ -495,4 +592,3 @@ window.onload = () => {
 };
 
 gameLoop();
-
